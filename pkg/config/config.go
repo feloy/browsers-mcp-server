@@ -1,9 +1,8 @@
 package config
 
 import (
-	"os"
-
 	"github.com/BurntSushi/toml"
+	"github.com/feloy/mcp-server/pkg/system"
 )
 
 // StaticConfig is the configuration for the server.
@@ -16,7 +15,7 @@ type StaticConfig struct {
 
 // ReadConfig reads the toml file and returns the StaticConfig.
 func ReadConfig(configPath string) (*StaticConfig, error) {
-	configData, err := os.ReadFile(configPath)
+	configData, err := system.ReadFile(configPath)
 	if err != nil {
 		return nil, err
 	}
