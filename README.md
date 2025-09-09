@@ -1,1 +1,64 @@
 # Browsers MCP server
+
+An MCP server provideing read-only access to browsers configuration files.
+
+Supported browsers: Chrome, Firefox.
+
+## Tools
+
+### list_browsers
+
+List discovered browsers.
+
+### list_profiles
+
+List profiles for a specific browser.
+
+Parameters: 
+- `browser` (`string`, optional): the browser name (as returned by `list_browsers`). Required if `list_browsers` returns several browsers.
+
+### list_bookmarks
+
+List bookmarks for a given profile of a given browser.
+
+Parameters:
+- `browser` (`string`, optional): the browser name (as returned by `list_browsers`). Required if `list_browsers` returns several browsers.
+- `profile` (`string`, optional): the profile name (as returned by `list_profiles`). Required if `list_profiles` returns several profiles for the given browser.
+
+## Getting Started
+
+
+### Claude Desktop
+
+If you have npm installed, this is the fastest way to get started with `browsers-mcp-server` on Claude Desktop.
+
+Open your `claude_desktop_config.json` and add the mcp server to the list of `mcpServers`:
+``` json
+{
+  "mcpServers": {
+    "browsers": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "browsers-mcp-server@latest"
+      ]
+    }
+  }
+}
+```
+
+
+### Cursor
+
+Install the extension manually by editing the `mcp.json` file:
+
+```json
+{
+  "mcpServers": {
+    "browsers-mcp-server": {
+      "command": "npx",
+      "args": ["-y", "browsers-mcp-server@latest"]
+    }
+  }
+}
+```
