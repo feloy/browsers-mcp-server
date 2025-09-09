@@ -1,0 +1,11 @@
+{
+  "name": "browsers-mcp-server-linux-arm64",
+  "version": "0.0.0",
+  "description": "Model Context Protocol (MCP) server for Browsers",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ]
+}

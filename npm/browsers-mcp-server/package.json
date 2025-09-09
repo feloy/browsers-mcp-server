@@ -1,0 +1,37 @@
+{
+  "name": "browsers-mcp-server",
+  "version": "0.0.0",
+  "description": "Model Context Protocol (MCP) server for Browsers",
+  "main": "./bin/index.js",
+  "bin": {
+    "browsers-mcp-server": "bin/index.js"
+  },
+  "optionalDependencies": {
+    "browsers-mcp-server-darwin-amd64": "0.0.0",
+    "browsers-mcp-server-darwin-arm64": "0.0.0",
+    "browsers-mcp-server-linux-amd64": "0.0.0",
+    "browsers-mcp-server-linux-arm64": "0.0.0",
+    "browsers-mcp-server-windows-amd64": "0.0.0",
+    "browsers-mcp-server-windows-arm64": "0.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feloy/browsers-mcp-server.git"
+  },
+  "keywords": [
+    "mcp",
+    "browsers",
+    "model context protocol",
+    "model",
+    "context",
+    "protocol"
+  ],
+  "author": {
+    "name": "Philippe MARTIN"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/feloy/browsers-mcp-server/issues"
+  },
+  "homepage": "https://github.com/feloy/browsers-mcp-server#readme"
+}
