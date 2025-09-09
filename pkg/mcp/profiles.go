@@ -37,7 +37,9 @@ func (p *FullProfile) GetDescription() string {
 }
 func (p *FullProfile) GetTools(s *Server) []server.ServerTool {
 	return slices.Concat(
-		s.initTool1(),
+		s.initBrowsersList(),
+		s.initProfilesList(),
+		s.initBookmarksList(),
 	)
 }
 
