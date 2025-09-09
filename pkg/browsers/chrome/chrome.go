@@ -1,6 +1,8 @@
 package chrome
 
 import (
+	"fmt"
+
 	"github.com/feloy/mcp-server/pkg/api"
 	"github.com/feloy/mcp-server/pkg/browsers"
 	"github.com/feloy/mcp-server/pkg/browsers/chrome/files"
@@ -25,6 +27,19 @@ func (o *Chrome) Profiles() ([]string, error) {
 		return nil, err
 	}
 	return localState.Profile.ProfilesOrder, nil
+}
+
+func (o *Chrome) Bookmarks(profileName string) ([]api.BookMark, error) {
+	profiles, err := o.Profiles()
+	if err != nil {
+		return nil, err
+	}
+	for _, profile := range profiles {
+		if profile == profileName {
+			return files.ListBookmarks(profile)
+		}
+	}
+	return nil, fmt.Errorf("profile %s not found", profileName)
 }
 
 func init() {

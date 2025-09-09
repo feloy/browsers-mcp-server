@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/feloy/mcp-server/pkg/api"
 	"github.com/feloy/mcp-server/pkg/browsers/test"
 )
 
@@ -16,16 +17,48 @@ func TestGetBrowsers(t *testing.T) {
 		{
 			name: "only available browsers are returned",
 			browsers: []*test.Browser{
-				test.NewBrowser("browser1", true, nil, []string{"profile1"}, nil),
-				test.NewBrowser("browser2", false, nil, []string{"profile2"}, nil),
+				test.NewBrowser(test.NewBrowserOptions{
+					Name:           "browser1",
+					Available:      true,
+					AvailableError: nil,
+					Profiles:       []string{"profile1"},
+					ProfilesError:  nil,
+					Bookmarks:      []api.BookMark{},
+					BookmarksError: nil,
+				}),
+				test.NewBrowser(test.NewBrowserOptions{
+					Name:           "browser2",
+					Available:      false,
+					AvailableError: nil,
+					Profiles:       []string{"profile2"},
+					ProfilesError:  nil,
+					Bookmarks:      []api.BookMark{},
+					BookmarksError: nil,
+				}),
 			},
 			expected: []string{"browser1"},
 		},
 		{
 			name: "available error is not returned",
 			browsers: []*test.Browser{
-				test.NewBrowser("browser1", false, errors.New("an errror"), []string{"profile1"}, nil),
-				test.NewBrowser("browser2", true, nil, []string{"profile2"}, nil),
+				test.NewBrowser(test.NewBrowserOptions{
+					Name:           "browser1",
+					Available:      false,
+					AvailableError: errors.New("an errror"),
+					Profiles:       []string{"profile1"},
+					ProfilesError:  nil,
+					Bookmarks:      []api.BookMark{},
+					BookmarksError: nil,
+				}),
+				test.NewBrowser(test.NewBrowserOptions{
+					Name:           "browser2",
+					Available:      true,
+					AvailableError: nil,
+					Profiles:       []string{"profile2"},
+					ProfilesError:  nil,
+					Bookmarks:      []api.BookMark{},
+					BookmarksError: nil,
+				}),
 			},
 			expected: []string{"browser2"},
 		},
@@ -60,7 +93,15 @@ func TestGetBrowserByName(t *testing.T) {
 			name:        "browser is found",
 			browserName: "browser1",
 			browsers: []*test.Browser{
-				test.NewBrowser("browser1", true, nil, []string{"profile1"}, nil),
+				test.NewBrowser(test.NewBrowserOptions{
+					Name:           "browser1",
+					Available:      true,
+					AvailableError: nil,
+					Profiles:       []string{"profile1"},
+					ProfilesError:  nil,
+					Bookmarks:      []api.BookMark{},
+					BookmarksError: nil,
+				}),
 			},
 			expected:      "browser1",
 			expectedError: nil,
@@ -69,7 +110,15 @@ func TestGetBrowserByName(t *testing.T) {
 			name:        "browser not found",
 			browserName: "browser2",
 			browsers: []*test.Browser{
-				test.NewBrowser("browser1", true, nil, []string{"profile1"}, nil),
+				test.NewBrowser(test.NewBrowserOptions{
+					Name:           "browser1",
+					Available:      true,
+					AvailableError: nil,
+					Profiles:       []string{"profile1"},
+					ProfilesError:  nil,
+					Bookmarks:      []api.BookMark{},
+					BookmarksError: nil,
+				}),
 			},
 			expected:      "",
 			expectedError: errors.New("browser \"browser2\" not found"),
@@ -78,7 +127,15 @@ func TestGetBrowserByName(t *testing.T) {
 			name:        "browser is not available",
 			browserName: "browser1",
 			browsers: []*test.Browser{
-				test.NewBrowser("browser1", false, nil, []string{"profile1"}, nil),
+				test.NewBrowser(test.NewBrowserOptions{
+					Name:           "browser1",
+					Available:      false,
+					AvailableError: nil,
+					Profiles:       []string{"profile1"},
+					ProfilesError:  nil,
+					Bookmarks:      []api.BookMark{},
+					BookmarksError: nil,
+				}),
 			},
 			expected:      "",
 			expectedError: errors.New("browser \"browser1\" is not available"),
@@ -87,7 +144,15 @@ func TestGetBrowserByName(t *testing.T) {
 			name:        "browser is available error",
 			browserName: "browser1",
 			browsers: []*test.Browser{
-				test.NewBrowser("browser1", true, errors.New("an error"), []string{"profile1"}, nil),
+				test.NewBrowser(test.NewBrowserOptions{
+					Name:           "browser1",
+					Available:      true,
+					AvailableError: errors.New("an error"),
+					Profiles:       []string{"profile1"},
+					ProfilesError:  nil,
+					Bookmarks:      []api.BookMark{},
+					BookmarksError: nil,
+				}),
 			},
 			expected:      "",
 			expectedError: errors.New("an error"),

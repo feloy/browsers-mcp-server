@@ -10,15 +10,29 @@ type Browser struct {
 	availableError error
 	profiles       []string
 	profilesError  error
+	bookmarks      []api.BookMark
+	bookmarksError error
 }
 
-func NewBrowser(name string, available bool, availableError error, profiles []string, profilesError error) *Browser {
+type NewBrowserOptions struct {
+	Name           string
+	Available      bool
+	AvailableError error
+	Profiles       []string
+	ProfilesError  error
+	Bookmarks      []api.BookMark
+	BookmarksError error
+}
+
+func NewBrowser(options NewBrowserOptions) *Browser {
 	return &Browser{
-		name:           name,
-		available:      available,
-		availableError: availableError,
-		profiles:       profiles,
-		profilesError:  profilesError,
+		name:           options.Name,
+		available:      options.Available,
+		availableError: options.AvailableError,
+		profiles:       options.Profiles,
+		profilesError:  options.ProfilesError,
+		bookmarks:      options.Bookmarks,
+		bookmarksError: options.BookmarksError,
 	}
 }
 
@@ -32,4 +46,8 @@ func (o *Browser) IsAvailable() (bool, error) {
 
 func (o *Browser) Profiles() ([]string, error) {
 	return o.profiles, o.profilesError
+}
+
+func (o *Browser) Bookmarks(profile string) ([]api.BookMark, error) {
+	return o.bookmarks, o.bookmarksError
 }

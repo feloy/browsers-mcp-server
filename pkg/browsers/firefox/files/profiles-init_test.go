@@ -1,7 +1,6 @@
 package files
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -26,5 +25,16 @@ Default=1
 	if len(profiles) == 0 {
 		t.Errorf("Expected at least one profile, got %d", len(profiles))
 	}
-	fmt.Printf("profiles: %v", profiles)
+	if profiles[0].Name != "my-profile" {
+		t.Errorf("Expected my-profile, got %s", profiles[0].Name)
+	}
+	if profiles[0].IsRelative != true {
+		t.Errorf("Expected IsRelative to be true, got %v", profiles[0].IsRelative)
+	}
+	if profiles[0].Path != "path/to/profile" {
+		t.Errorf("Expected path/to/profile, got %s", profiles[0].Path)
+	}
+	if profiles[0].Default != true {
+		t.Errorf("Expected Default to be true, got %v", profiles[0].Default)
+	}
 }
