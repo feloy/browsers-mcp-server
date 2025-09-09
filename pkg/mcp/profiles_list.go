@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/feloy/mcp-server/pkg/browsers"
+	"github.com/feloy/browsers-mcp-server/pkg/browsers"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )

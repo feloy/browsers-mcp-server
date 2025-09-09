@@ -1,4 +1,4 @@
-module github.com/feloy/mcp-server
+module github.com/feloy/browsers-mcp-server
 
 go 1.24.4
 

@@ -1,6 +1,6 @@
 package test
 
-import "github.com/feloy/mcp-server/pkg/api"
+import "github.com/feloy/browsers-mcp-server/pkg/api"
 
 var _ api.Browser = &Browser{}
 

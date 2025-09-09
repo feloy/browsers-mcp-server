@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/BurntSushi/toml"
-	"github.com/feloy/mcp-server/pkg/system"
+	"github.com/feloy/browsers-mcp-server/pkg/system"
 )
 
 // StaticConfig is the configuration for the server.

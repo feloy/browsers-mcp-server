@@ -9,8 +9,8 @@ import (
 	"github.com/mark3labs/mcp-go/server"
 	"k8s.io/klog/v2"
 
-	"github.com/feloy/mcp-server/pkg/config"
-	"github.com/feloy/mcp-server/pkg/version"
+	"github.com/feloy/browsers-mcp-server/pkg/config"
+	"github.com/feloy/browsers-mcp-server/pkg/version"
 )
 
 type Configuration struct {

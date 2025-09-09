@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/feloy/mcp-server/pkg/system"
+	"github.com/feloy/browsers-mcp-server/pkg/system"
 )
 
 func getUserDataDirecory() string {

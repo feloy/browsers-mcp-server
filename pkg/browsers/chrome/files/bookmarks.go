@@ -7,9 +7,9 @@ import (
 
 	"github.com/andrewarchi/browser/jsonutil/timefmt"
 	"github.com/andrewarchi/browser/jsonutil/uuid"
-	"github.com/feloy/mcp-server/pkg/api"
-	"github.com/feloy/mcp-server/pkg/browsers/chrome/files/fields"
-	"github.com/feloy/mcp-server/pkg/system"
+	"github.com/feloy/browsers-mcp-server/pkg/api"
+	"github.com/feloy/browsers-mcp-server/pkg/browsers/chrome/files/fields"
+	"github.com/feloy/browsers-mcp-server/pkg/system"
 )
 
 // Bookmarks contains Chrome bookmark information.

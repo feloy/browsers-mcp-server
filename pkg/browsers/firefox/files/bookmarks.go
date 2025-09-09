@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"path/filepath"
 
-	"github.com/feloy/mcp-server/pkg/api"
+	"github.com/feloy/browsers-mcp-server/pkg/api"
 	_ "modernc.org/sqlite"
 )
 

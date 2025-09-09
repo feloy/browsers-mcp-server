@@ -12,10 +12,10 @@ import (
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/textlogger"
 
-	"github.com/feloy/mcp-server/pkg/config"
-	"github.com/feloy/mcp-server/pkg/genericiooptions"
-	"github.com/feloy/mcp-server/pkg/mcp"
-	"github.com/feloy/mcp-server/pkg/version"
+	"github.com/feloy/browsers-mcp-server/pkg/config"
+	"github.com/feloy/browsers-mcp-server/pkg/genericiooptions"
+	"github.com/feloy/browsers-mcp-server/pkg/mcp"
+	"github.com/feloy/browsers-mcp-server/pkg/version"
 )
 
 var (

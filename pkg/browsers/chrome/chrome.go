@@ -3,9 +3,9 @@ package chrome
 import (
 	"fmt"
 
-	"github.com/feloy/mcp-server/pkg/api"
-	"github.com/feloy/mcp-server/pkg/browsers"
-	"github.com/feloy/mcp-server/pkg/browsers/chrome/files"
+	"github.com/feloy/browsers-mcp-server/pkg/api"
+	"github.com/feloy/browsers-mcp-server/pkg/browsers"
+	"github.com/feloy/browsers-mcp-server/pkg/browsers/chrome/files"
 )
 
 var instance api.Browser = &Chrome{}

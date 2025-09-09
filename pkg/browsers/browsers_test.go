@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/feloy/mcp-server/pkg/api"
-	"github.com/feloy/mcp-server/pkg/browsers/test"
+	"github.com/feloy/browsers-mcp-server/pkg/api"
+	"github.com/feloy/browsers-mcp-server/pkg/browsers/test"
 )
 
 func TestGetBrowsers(t *testing.T) {

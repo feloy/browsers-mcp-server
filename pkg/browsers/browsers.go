@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/feloy/mcp-server/pkg/api"
+	"github.com/feloy/browsers-mcp-server/pkg/api"
 )
 
 var providers = map[string]api.Browser{}

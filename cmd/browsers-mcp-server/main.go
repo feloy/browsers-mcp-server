@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/feloy/mcp-server/pkg/genericiooptions"
-	"github.com/feloy/mcp-server/pkg/mcp-server/cmd"
+	"github.com/feloy/browsers-mcp-server/pkg/genericiooptions"
+	"github.com/feloy/browsers-mcp-server/pkg/mcp-server/cmd"
 )
 
 func main() {

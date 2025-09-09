@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/feloy/mcp-server/pkg/system"
+	"github.com/feloy/browsers-mcp-server/pkg/system"
 	"github.com/spf13/afero"
 )
 

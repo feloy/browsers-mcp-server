@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/feloy/mcp-server/pkg/api"
-	"github.com/feloy/mcp-server/pkg/browsers"
-	"github.com/feloy/mcp-server/pkg/browsers/test"
-	"github.com/feloy/mcp-server/pkg/config"
+	"github.com/feloy/browsers-mcp-server/pkg/api"
+	"github.com/feloy/browsers-mcp-server/pkg/browsers"
+	"github.com/feloy/browsers-mcp-server/pkg/browsers/test"
+	"github.com/feloy/browsers-mcp-server/pkg/config"
 	"github.com/google/go-cmp/cmp"
 	"github.com/mark3labs/mcp-go/mcp"
 )

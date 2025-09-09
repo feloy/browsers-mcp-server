@@ -8,7 +8,7 @@ import (
 
 	"gopkg.in/ini.v1"
 
-	"github.com/feloy/mcp-server/pkg/system"
+	"github.com/feloy/browsers-mcp-server/pkg/system"
 )
 
 type Profile struct {
