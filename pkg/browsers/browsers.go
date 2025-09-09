@@ -2,6 +2,8 @@ package browsers
 
 import (
 	"fmt"
+	"slices"
+	"strings"
 
 	"github.com/feloy/mcp-server/pkg/api"
 )
@@ -33,6 +35,9 @@ func GetBrowsers() []api.Browser {
 		}
 		availableBrowsers = append(availableBrowsers, provider)
 	}
+	slices.SortFunc(availableBrowsers, func(a, b api.Browser) int {
+		return strings.Compare(a.Name(), b.Name())
+	})
 	return availableBrowsers
 }
 
