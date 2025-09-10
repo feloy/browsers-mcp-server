@@ -46,6 +46,19 @@ func (o *Firefox) Bookmarks(profileName string) ([]api.BookMark, error) {
 	return nil, fmt.Errorf("profile %s not found", profileName)
 }
 
+func (o *Firefox) SearchEngineQueries(profileName string, options api.SearchEngineOptions) ([]api.SearchEngineQuery, error) {
+	profiles, err := files.ReadProfilesIni()
+	if err != nil {
+		return nil, err
+	}
+	for _, profile := range profiles {
+		if profile.Name == profileName {
+			return files.SearchEngineQueries(profile.Path, profile.IsRelative, options)
+		}
+	}
+	return nil, fmt.Errorf("profile %s not found", profileName)
+}
+
 func init() {
 	browsers.Register(instance)
 }
