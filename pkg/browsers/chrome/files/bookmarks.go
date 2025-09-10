@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/andrewarchi/browser/jsonutil/timefmt"
 	"github.com/andrewarchi/browser/jsonutil/uuid"
 	"github.com/feloy/browsers-mcp-server/pkg/api"
 	"github.com/feloy/browsers-mcp-server/pkg/browsers/chrome/files/fields"
@@ -28,17 +27,12 @@ type BookmarkEntry struct {
 	Children     []BookmarkEntry     `json:"children"` // for folder type only
 	DateAdded    fields.QuotedChrome `json:"date_added"`
 	DateModified fields.QuotedChrome `json:"date_modified,omitempty"` // for folder type only
-	GUID         *uuid.UUID          `json:"guid"`                    // "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-	ID           string              `json:"id"`                      // e.g. "567"
+	DateLastUsed fields.QuotedChrome `json:"date_last_used,omitempty"`
+	GUID         *uuid.UUID          `json:"guid"` // "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+	ID           string              `json:"id"`   // e.g. "567"
 	Name         string              `json:"name"`
-	Type         string              `json:"type"` // "folder" or "url"
-	MetaInfo     *BookmarkMetaInfo   `json:"meta_info,omitempty"`
+	Type         string              `json:"type"`          // "folder" or "url"
 	URL          string              `json:"url,omitempty"` // for url type only
-}
-
-// BookmarkMetaInfo contains additional bookmark metadata.
-type BookmarkMetaInfo struct {
-	LastVisitedDesktop timefmt.QuotedChrome `json:"last_visited_desktop"`
 }
 
 // ParseBookmarks returns the bookmarks in a Chrome profile.
@@ -71,9 +65,12 @@ func flatBookmarksRec(entry BookmarkEntry, folder []string) []api.BookMark {
 	}
 	if entry.Type == "url" {
 		result = append(result, api.BookMark{
-			Name:   entry.Name,
-			URL:    entry.URL,
-			Folder: folder,
+			Name:            entry.Name,
+			URL:             entry.URL,
+			Folder:          folder,
+			DateAdded:       entry.DateAdded.Time,
+			DateModified:    entry.DateModified.Time,
+			DateLastVisited: entry.DateLastUsed.Time,
 		})
 	}
 	return result

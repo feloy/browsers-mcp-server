@@ -2,7 +2,9 @@ package files
 
 import (
 	"database/sql"
+	"fmt"
 	"path/filepath"
+	"time"
 
 	"github.com/feloy/browsers-mcp-server/pkg/api"
 	_ "modernc.org/sqlite"
@@ -24,31 +26,41 @@ func ListBookmarks(profile string, isRelative bool) ([]api.BookMark, error) {
 }
 
 func listBookmarksRec(db *sql.DB, parent int, folder []string, result *[]api.BookMark) error {
-	subdirs, titles, err := getSubdirs(db, parent)
+	subdirs, err := getSubdirs(db, parent)
 	if err != nil {
 		return err
 	}
 
-	leafs, leafTitles, leafUrls, err := getLeafs(db, parent)
+	leafs, err := getLeafs(db, parent)
 	if err != nil {
 		return err
 	}
 	if len(leafs) > 0 {
 		for i := range leafs {
-			*result = append(*result, api.BookMark{
-				Name:   leafTitles[i],
-				URL:    leafUrls[i],
+			bm := api.BookMark{
+				Name:   leafs[i].title,
+				URL:    leafs[i].url,
 				Folder: folder,
-			})
+			}
+			if leafs[i].dateAdded != nil {
+				bm.DateAdded = time.Unix(int64(*leafs[i].dateAdded/1_000_000), 0)
+			}
+			if leafs[i].dateModified != nil {
+				bm.DateModified = time.Unix(int64(*leafs[i].dateModified/1_000_000), 0)
+			}
+			if leafs[i].dateLastVisited != nil {
+				bm.DateLastVisited = time.Unix(int64(*leafs[i].dateLastVisited/1_000_000), 0)
+			}
+			*result = append(*result, bm)
 		}
 	}
 
 	for i, subdir := range subdirs {
 		newFolder := folder
-		if titles[i] != "" {
-			newFolder = append(folder, titles[i])
+		if subdirs[i].title != "" {
+			newFolder = append(folder, subdirs[i].title)
 		}
-		listBookmarksRec(db, subdir, newFolder, result)
+		listBookmarksRec(db, subdir.id, newFolder, result)
 	}
 	return nil
 }
@@ -61,49 +73,55 @@ func getDb(profile string, isRelative bool) (*sql.DB, error) {
 	return sql.Open("sqlite", path)
 }
 
-func getSubdirs(db *sql.DB, parent int) ([]int, []string, error) {
-	rows, err := db.Query("SELECT id, title FROM moz_bookmarks WHERE parent = ? AND type = 2", parent)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer rows.Close()
-
-	var ids []int
-	var titles []string
-	for rows.Next() {
-		var id int
-		var title string
-		err = rows.Scan(&id, &title)
-		if err != nil {
-			return nil, nil, err
-		}
-		ids = append(ids, id)
-		titles = append(titles, title)
-	}
-	return ids, titles, nil
+type subdir struct {
+	id    int
+	title string
 }
 
-func getLeafs(db *sql.DB, parent int) ([]int, []string, []string, error) {
-	rows, err := db.Query(" SELECT b.id, b.title, p.url FROM moz_bookmarks AS b INNER JOIN moz_places AS p ON b.fk = p.id WHERE b.parent = ? AND b.type = 1;", parent)
+func getSubdirs(db *sql.DB, parent int) ([]subdir, error) {
+	rows, err := db.Query("SELECT id, title FROM moz_bookmarks WHERE parent = ? AND type = 2", parent)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, err
 	}
 	defer rows.Close()
 
-	var ids []int
-	var titles []string
-	var urls []string
+	var subdirs []subdir
 	for rows.Next() {
-		var id int
-		var title string
-		var url string
-		err = rows.Scan(&id, &title, &url)
+		var subdir subdir
+		err = rows.Scan(&subdir.id, &subdir.title)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, err
 		}
-		ids = append(ids, id)
-		titles = append(titles, title)
-		urls = append(urls, url)
+		subdirs = append(subdirs, subdir)
 	}
-	return ids, titles, urls, nil
+	return subdirs, nil
+}
+
+type leaf struct {
+	id              int
+	title           string
+	url             string
+	dateAdded       *int
+	dateModified    *int
+	dateLastVisited *int
+}
+
+func getLeafs(db *sql.DB, parent int) ([]leaf, error) {
+	rows, err := db.Query("SELECT b.id, b.title, p.url, b.dateAdded, b.lastModified, p.last_visit_date FROM moz_bookmarks AS b INNER JOIN moz_places AS p ON b.fk = p.id WHERE b.parent = ? AND b.type = 1;", parent)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var leafs []leaf
+	for rows.Next() {
+		var leaf leaf
+		err = rows.Scan(&leaf.id, &leaf.title, &leaf.url, &leaf.dateAdded, &leaf.dateModified, &leaf.dateLastVisited)
+		fmt.Printf("leaf: %v\n", leaf)
+		if err != nil {
+			return nil, err
+		}
+		leafs = append(leafs, leaf)
+	}
+	return leafs, nil
 }

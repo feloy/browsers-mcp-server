@@ -4,8 +4,10 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/feloy/browsers-mcp-server/pkg/system"
+	globaltest "github.com/feloy/browsers-mcp-server/pkg/test"
 	"github.com/spf13/afero"
 )
 
@@ -18,7 +20,10 @@ func TestListBookmarks(t *testing.T) {
        "children": [{
 				"name": "RedHat",
 				"type": "url",
-				"url": "https://www.redhat.com"
+				"url": "https://www.redhat.com",
+				"date_added": "13390300334000000",
+				"date_modified": "13390300335000000",
+				"date_last_used": "13390300336000000"
 			}],
        "name": "Mobile Bookmarks",
        "type": "folder"
@@ -38,5 +43,14 @@ func TestListBookmarks(t *testing.T) {
 
 	if bookmarks[0].Name != "RedHat" {
 		t.Errorf("Expected RedHat, got %s", bookmarks[0].Name)
+	}
+	if bookmarks[0].DateAdded != globaltest.Must(time.Parse(time.RFC3339, "2025-04-28T07:52:14Z")) {
+		t.Errorf("Expected 2021-01-01T00:00:00Z, got %s", bookmarks[0].DateAdded)
+	}
+	if bookmarks[0].DateModified != globaltest.Must(time.Parse(time.RFC3339, "2025-04-28T07:52:15Z")) {
+		t.Errorf("Expected 2021-01-01T00:00:00Z, got %s", bookmarks[0].DateModified)
+	}
+	if bookmarks[0].DateLastVisited != globaltest.Must(time.Parse(time.RFC3339, "2025-04-28T07:52:16Z")) {
+		t.Errorf("Expected 2021-01-01T00:00:00Z, got %s", bookmarks[0].DateLastVisited)
 	}
 }
