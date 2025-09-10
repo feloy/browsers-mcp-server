@@ -40,6 +40,7 @@ func (p *FullProfile) GetTools(s *Server) []server.ServerTool {
 		s.initBrowsersList(),
 		s.initProfilesList(),
 		s.initBookmarksList(),
+		s.initSearchEngineQueries(),
 	)
 }
 

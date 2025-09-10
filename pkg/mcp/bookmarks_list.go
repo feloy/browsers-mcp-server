@@ -31,33 +31,18 @@ func (s *Server) initBookmarksList() []server.ServerTool {
 }
 
 func (s *Server) listBookmarks(_ context.Context, ctr mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	var browserName string
-	ok := false
-	if browserName, ok = ctr.GetArguments()["browser"].(string); !ok {
-		browsers := browsers.GetBrowsers()
-		if len(browsers) == 1 {
-			browserName = browsers[0].Name()
-		} else {
-			return NewTextResult("", fmt.Errorf("failed to get list of bookmarks, multiple browsers found, please specify the browser")), nil
-		}
+	browserName, err := s.getBrowserName(ctr, "list of bookmarks")
+	if err != nil {
+		return NewTextResult("", err), nil
 	}
 	browser, err := browsers.GetBrowserByName(browserName)
 	if err != nil {
 		return NewTextResult("", err), nil
 	}
 
-	var profileName string
-	ok = false
-	if profileName, ok = ctr.GetArguments()["profile"].(string); !ok {
-		profiles, err := browser.Profiles()
-		if err != nil {
-			return NewTextResult("", err), nil
-		}
-		if len(profiles) == 1 {
-			profileName = profiles[0]
-		} else {
-			return NewTextResult("", fmt.Errorf("failed to get list of bookmarks, multiple profiles found, please specify the profile")), nil
-		}
+	profileName, err := s.getProfileName(browser, ctr, "list of bookmarks")
+	if err != nil {
+		return NewTextResult("", err), nil
 	}
 
 	bookmarks, err := browser.Bookmarks(profileName)

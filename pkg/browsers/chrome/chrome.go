@@ -42,6 +42,19 @@ func (o *Chrome) Bookmarks(profileName string) ([]api.BookMark, error) {
 	return nil, fmt.Errorf("profile %s not found", profileName)
 }
 
+func (o *Chrome) SearchEngineQueries(profileName string, options api.SearchEngineOptions) ([]api.SearchEngineQuery, error) {
+	profiles, err := o.Profiles()
+	if err != nil {
+		return nil, err
+	}
+	for _, profile := range profiles {
+		if profile == profileName {
+			return files.SearchEngineQueries(profile, options)
+		}
+	}
+	return nil, fmt.Errorf("profile %s not found", profileName)
+}
+
 func init() {
 	browsers.Register(instance)
 }

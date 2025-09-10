@@ -25,6 +25,16 @@ Parameters:
 - `browser` (`string`, optional): the browser name (as returned by `list_browsers`). Required if `list_browsers` returns several browsers.
 - `profile` (`string`, optional): the profile name (as returned by `list_profiles`). Required if `list_profiles` returns several profiles for the given browser.
 
+### list_search_engine_queries
+
+List the queries in search engines (supported search engines: Google).
+
+Parameters:
+- `browser` (`string`, optional): the browser name (as returned by `list_browsers`). Required if `list_browsers` returns several browsers.
+- `profile` (`string`, optional): the profile name (as returned by `list_profiles`). Required if `list_profiles` returns several profiles for the given browser.
+- `start_time` (`string`, format `YYYY-MM-DD:HH-MM-SS`, optional): list the search engine queries from this time, default is today at midnight.
+- `limit` (`number`, optional): the number of results to return, default is 10.
+
 ## Getting Started
 
 
