@@ -1,9 +1,14 @@
 package api
 
+import "time"
+
 type BookMark struct {
-	Name   string
-	URL    string
-	Folder []string
+	Name            string    `yaml:"name"`
+	URL             string    `yaml:"url"`
+	Folder          []string  `yaml:"folder"`
+	DateAdded       time.Time `yaml:"date_added,omitempty"`
+	DateModified    time.Time `yaml:"date_modified,omitempty"`
+	DateLastVisited time.Time `yaml:"date_last_visited,omitempty"`
 }
 
 type Browser interface {

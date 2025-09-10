@@ -3,11 +3,13 @@ package mcp
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/feloy/browsers-mcp-server/pkg/api"
 	"github.com/feloy/browsers-mcp-server/pkg/browsers"
 	"github.com/feloy/browsers-mcp-server/pkg/browsers/test"
 	"github.com/feloy/browsers-mcp-server/pkg/config"
+	globaltest "github.com/feloy/browsers-mcp-server/pkg/test"
 	"github.com/google/go-cmp/cmp"
 	"github.com/mark3labs/mcp-go/mcp"
 )
@@ -21,6 +23,8 @@ func TestListBookmarks(t *testing.T) {
 		Bookmarks: []api.BookMark{
 			{
 				Name: "bookmark1a", URL: "https://www.bookmark1a.com", Folder: []string{"folder1a"},
+				DateAdded:       globaltest.Must(time.Parse(time.RFC3339, "2021-01-01T00:00:00Z")),
+				DateLastVisited: globaltest.Must(time.Parse(time.RFC3339, "2021-04-01T00:00:00Z")),
 			},
 		},
 	})
@@ -39,6 +43,9 @@ func TestListBookmarks(t *testing.T) {
 		Bookmarks: []api.BookMark{
 			{
 				Name: "bookmark3a", URL: "https://www.bookmark3a.com", Folder: []string{"folder3a"},
+				DateAdded:       globaltest.Must(time.Parse(time.RFC3339, "2023-01-01T00:00:00Z")),
+				DateModified:    globaltest.Must(time.Parse(time.RFC3339, "2023-02-01T00:00:00Z")),
+				DateLastVisited: globaltest.Must(time.Parse(time.RFC3339, "2023-04-01T00:00:00Z")),
 			},
 		},
 	})
@@ -57,6 +64,8 @@ func TestListBookmarks(t *testing.T) {
   url: https://www.bookmark1a.com
   folder:
     - folder1a
+  date_added: 2021-01-01T00:00:00Z
+  date_last_visited: 2021-04-01T00:00:00Z
 `,
 		},
 		{
@@ -80,6 +89,8 @@ func TestListBookmarks(t *testing.T) {
   url: https://www.bookmark1a.com
   folder:
     - folder1a
+  date_added: 2021-01-01T00:00:00Z
+  date_last_visited: 2021-04-01T00:00:00Z
 `,
 		},
 		{
@@ -102,6 +113,9 @@ func TestListBookmarks(t *testing.T) {
   url: https://www.bookmark3a.com
   folder:
     - folder3a
+  date_added: 2023-01-01T00:00:00Z
+  date_modified: 2023-02-01T00:00:00Z
+  date_last_visited: 2023-04-01T00:00:00Z
 `,
 		},
 	} {
