@@ -2,7 +2,6 @@ package files
 
 import (
 	"database/sql"
-	"fmt"
 	"path/filepath"
 	"time"
 
@@ -117,7 +116,6 @@ func getLeafs(db *sql.DB, parent int) ([]leaf, error) {
 	for rows.Next() {
 		var leaf leaf
 		err = rows.Scan(&leaf.id, &leaf.title, &leaf.url, &leaf.dateAdded, &leaf.dateModified, &leaf.dateLastVisited)
-		fmt.Printf("leaf: %v\n", leaf)
 		if err != nil {
 			return nil, err
 		}

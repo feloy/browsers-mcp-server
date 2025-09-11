@@ -22,10 +22,23 @@ type SearchEngineOptions struct {
 	Limit     int
 }
 
+type VisitedPageFromSearchEngineQuery struct {
+	URL          string    `yaml:"url"`
+	Title        string    `yaml:"title"`
+	Date         time.Time `yaml:"date"`
+	SearchEngine string    `yaml:"search_engine"`
+}
+
+type ListVisitedPagesFromSearchEngineQueryOptions struct {
+	Query     string
+	StartTime *time.Time
+}
+
 type Browser interface {
 	Name() string
 	IsAvailable() (bool, error)
 	Profiles() ([]string, error)
 	Bookmarks(profile string) ([]BookMark, error)
 	SearchEngineQueries(profile string, options SearchEngineOptions) ([]SearchEngineQuery, error)
+	ListVisitedPagesFromSearchEngineQuery(profile string, options ListVisitedPagesFromSearchEngineQueryOptions) ([]VisitedPageFromSearchEngineQuery, error)
 }
