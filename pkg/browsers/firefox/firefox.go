@@ -59,6 +59,19 @@ func (o *Firefox) SearchEngineQueries(profileName string, options api.SearchEngi
 	return nil, fmt.Errorf("profile %s not found", profileName)
 }
 
+func (o *Firefox) ListVisitedPagesFromSearchEngineQuery(profileName string, options api.ListVisitedPagesFromSearchEngineQueryOptions) ([]api.VisitedPageFromSearchEngineQuery, error) {
+	profiles, err := files.ReadProfilesIni()
+	if err != nil {
+		return nil, err
+	}
+	for _, profile := range profiles {
+		if profile.Name == profileName {
+			return files.ListVisitedPagesFromSearchEngineQuery(profile.Path, profile.IsRelative, options)
+		}
+	}
+	return nil, fmt.Errorf("profile %s not found", profileName)
+}
+
 func init() {
 	browsers.Register(instance)
 }

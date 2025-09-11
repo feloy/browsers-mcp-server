@@ -36,6 +36,28 @@ func (s *Server) initSearchEngineQueries() []server.ServerTool {
 				),
 			),
 			Handler: s.listSearchEngineQueries,
+		}, {
+			Tool: mcp.NewTool("list_visited_pages_from_search_engine_query",
+				mcp.WithDescription("list visited pages from a search engine query"),
+				mcp.WithString(
+					"browser",
+					mcp.Description("The browser to list the visited pages for"),
+				),
+				mcp.WithString(
+					"profile",
+					mcp.Description("The browser's profile to list the visited pages for, required if there are multiple profiles"),
+				),
+				mcp.WithString(
+					"query",
+					mcp.Description("The query string to list the visited pages for"),
+					mcp.Required(),
+				),
+				mcp.WithString(
+					"start_time",
+					mcp.Description("List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight"),
+				),
+			),
+			Handler: s.listVisitedPagesFromSearchEngineQuery,
 		},
 	}
 	return tools
@@ -81,4 +103,46 @@ func (s *Server) listSearchEngineQueries(_ context.Context, ctr mcp.CallToolRequ
 	}
 
 	return NewTextResult(fmt.Sprintf("The following search queries (YAML format) were found:\n%s", string(yamlSearchEngineQueries)), nil), nil
+}
+
+func (s *Server) listVisitedPagesFromSearchEngineQuery(_ context.Context, ctr mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	browserName, err := s.getBrowserName(ctr, "visited pages from search engine query")
+	if err != nil {
+		return NewTextResult("", err), nil
+	}
+	browser, err := browsers.GetBrowserByName(browserName)
+	if err != nil {
+		return NewTextResult("", err), nil
+	}
+
+	profileName, err := s.getProfileName(browser, ctr, "visited pages from search engine query")
+	if err != nil {
+		return NewTextResult("", err), nil
+	}
+
+	var startTime *time.Time
+	if startTimeStr, ok := ctr.GetArguments()["start_time"].(string); ok {
+		t, err := time.Parse(time.DateTime, startTimeStr)
+		if err != nil {
+			return NewTextResult("", err), nil
+		}
+		startTime = &t
+	}
+
+	query, ok := ctr.GetArguments()["query"].(string)
+	if !ok {
+		return NewTextResult("", fmt.Errorf("query is required")), nil
+	}
+
+	visitedPages, err := browser.ListVisitedPagesFromSearchEngineQuery(profileName, api.ListVisitedPagesFromSearchEngineQueryOptions{StartTime: startTime, Query: query})
+	if err != nil {
+		return NewTextResult("", err), nil
+	}
+
+	yamlVisitedPages, err := yaml.Marshal(visitedPages)
+	if err != nil {
+		return NewTextResult("", err), nil
+	}
+
+	return NewTextResult(fmt.Sprintf("The following visited pages (YAML format) were found:\n%s", string(yamlVisitedPages)), nil), nil
 }
