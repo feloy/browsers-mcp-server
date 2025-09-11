@@ -1,6 +1,6 @@
 # Browsers MCP server
 
-An MCP server provideing read-only access to browsers configuration files.
+An MCP server provideing read-only access to browsers configuration files: profiles, bookmarks, history.
 
 Supported browsers: Chrome, Firefox.
 
@@ -34,6 +34,17 @@ Parameters:
 - `profile` (`string`, optional): the profile name (as returned by `list_profiles`). Required if `list_profiles` returns several profiles for the given browser.
 - `start_time` (`string`, format `YYYY-MM-DD HH:MM:SS`, optional): list the search engine queries from this time, default is today at midnight.
 - `limit` (`number`, optional): the number of results to return, default is 10.
+
+### list_visited_pages_from_search_engine_query
+
+List the pages visited from a search engine query.
+
+Parameters:
+- `browser` (`string`, optional): the browser name (as returned by `list_browsers`). Required if `list_browsers` returns several browsers.
+- `profile` (`string`, optional): the profile name (as returned by `list_profiles`). Required if `list_profiles` returns several profiles for the given browser.
+- `query` (`string`, required): the query string to list the visited pages for.
+- `start_time` (`string`, format `YYYY-MM-DD HH:MM:SS`, optional): list the search engine queries from this time, default is today at midnight.
+
 
 ## Getting Started
 
