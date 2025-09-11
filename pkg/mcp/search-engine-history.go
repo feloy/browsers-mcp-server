@@ -27,7 +27,7 @@ func (s *Server) initSearchEngineQueries() []server.ServerTool {
 				),
 				mcp.WithString(
 					"start_time",
-					mcp.Description("List the search engine queries from this time (YYYY-MM-DD:HH-MM-SS), default is today at midnight"),
+					mcp.Description("List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight"),
 				),
 				mcp.WithNumber(
 					"limit",
@@ -58,7 +58,7 @@ func (s *Server) listSearchEngineQueries(_ context.Context, ctr mcp.CallToolRequ
 
 	var startTime *time.Time
 	if startTimeStr, ok := ctr.GetArguments()["start_time"].(string); ok {
-		t, err := time.Parse("2006-01-02:15-04-05", startTimeStr)
+		t, err := time.Parse(time.DateTime, startTimeStr)
 		if err != nil {
 			return NewTextResult("", err), nil
 		}
