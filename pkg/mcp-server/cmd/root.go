@@ -3,14 +3,11 @@ package cmd
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
-	"strconv"
 
 	"github.com/spf13/cobra"
 
 	"k8s.io/klog/v2"
-	"k8s.io/klog/v2/textlogger"
 
 	"github.com/feloy/browsers-mcp-server/pkg/config"
 	"github.com/feloy/browsers-mcp-server/pkg/genericiooptions"
@@ -41,6 +38,7 @@ type MCPServerOptions struct {
 	StaticConfig *config.StaticConfig
 
 	genericiooptions.IOStreams
+	Logger
 }
 
 func NewMCPServerOptions(streams genericiooptions.IOStreams) *MCPServerOptions {
@@ -59,6 +57,9 @@ func NewMCPServer(streams genericiooptions.IOStreams) *cobra.Command {
 		Long:    long,
 		Example: examples,
 		RunE: func(c *cobra.Command, args []string) error {
+			o.initLogger()
+			defer o.disposeLogger()
+
 			if err := o.Complete(c); err != nil {
 				return err
 			}
@@ -74,9 +75,8 @@ func NewMCPServer(streams genericiooptions.IOStreams) *cobra.Command {
 	}
 
 	cmd.Flags().BoolVar(&o.Version, "version", o.Version, "Print version information and quit")
-	cmd.Flags().IntVar(&o.LogLevel, "log-level", o.LogLevel, "Set the log level (from 0 to 9)")
 	cmd.Flags().StringVar(&o.ConfigPath, "config", o.ConfigPath, "Path of the config file. Each profile has its set of defaults.")
-
+	o.initLoggerFlags(cmd)
 	return cmd
 }
 
@@ -89,29 +89,7 @@ func (m *MCPServerOptions) Complete(cmd *cobra.Command) error {
 		m.StaticConfig = cnf
 	}
 
-	m.loadFlags(cmd)
-
-	m.initializeLogging()
-
 	return nil
-}
-
-func (m *MCPServerOptions) loadFlags(cmd *cobra.Command) {
-	if cmd.Flag("log-level").Changed {
-		m.StaticConfig.LogLevel = m.LogLevel
-	}
-}
-
-func (m *MCPServerOptions) initializeLogging() {
-	flagSet := flag.NewFlagSet("klog", flag.ContinueOnError)
-	klog.InitFlags(flagSet)
-	loggerOptions := []textlogger.ConfigOption{textlogger.Output(m.Out)}
-	if m.StaticConfig.LogLevel >= 0 {
-		loggerOptions = append(loggerOptions, textlogger.Verbosity(m.StaticConfig.LogLevel))
-		_ = flagSet.Parse([]string{"--v", strconv.Itoa(m.StaticConfig.LogLevel)})
-	}
-	logger := textlogger.NewLogger(textlogger.NewConfig(loggerOptions...))
-	klog.SetLoggerWithOptions(logger)
 }
 
 func (m *MCPServerOptions) Validate() error {
