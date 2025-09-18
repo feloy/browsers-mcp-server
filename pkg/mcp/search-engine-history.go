@@ -90,6 +90,9 @@ func (s *Server) listSearchEngineQueries(_ context.Context, ctr mcp.CallToolRequ
 	var limit int
 	if limitFloat, ok := ctr.GetArguments()["limit"].(float64); ok {
 		limit = int(limitFloat)
+	} else {
+		// should be set because of `mcp.DefaultNumber(10)` but this is not the case
+		limit = 10
 	}
 
 	searchEngineQueries, err := browser.SearchEngineQueries(profileName, api.SearchEngineOptions{StartTime: startTime, Limit: limit})

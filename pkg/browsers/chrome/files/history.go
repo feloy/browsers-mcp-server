@@ -7,10 +7,13 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/feloy/browsers-mcp-server/pkg/api"
 )
 
 func SearchEngineQueries(profile string, options api.SearchEngineOptions) ([]api.SearchEngineQuery, error) {
+	log.Debug("searching engine queries", "profile", profile, "options", options)
+
 	type queryResult struct {
 		VisitTime int64
 		URL       string

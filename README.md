@@ -83,3 +83,8 @@ Install the extension manually by editing the `mcp.json` file:
   }
 }
 ```
+
+## Troubleshooting
+
+You can output logs to a specific file with the `--log-file` flag, and indicate the log level with `--log-level=debug|info|warn|error` (default `warn`). By default, no logs are written.
+
