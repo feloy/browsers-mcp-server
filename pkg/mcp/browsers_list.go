@@ -9,6 +9,10 @@ import (
 	"github.com/mark3labs/mcp-go/server"
 )
 
+type ListBrowsersResult struct {
+	Names []string `json:"browsers"`
+}
+
 func (s *Server) initBrowsersList() []server.ServerTool {
 	tools := []server.ServerTool{
 		{
@@ -27,5 +31,5 @@ func (s *Server) listBrowsers(_ context.Context, ctr mcp.CallToolRequest) (*mcp.
 	for _, browser := range browsers {
 		names = append(names, browser.Name())
 	}
-	return NewTextResult(strings.Join(names, ", "), nil), nil
+	return NewStructuredResult(strings.Join(names, ", "), ListBrowsersResult{Names: names}, nil), nil
 }
