@@ -20,8 +20,7 @@ func TestReadConfigMissingFile(t *testing.T) {
 }
 
 func TestReadConfigInvalid(t *testing.T) {
-	invalidConfigPath := writeConfig(t, `log_level = 1
-port = "9999`)
+	invalidConfigPath := writeConfig(t, `port = "9999`)
 
 	config, err := ReadConfig(invalidConfigPath)
 	t.Run("returns error for invalid file", func(t *testing.T) {
@@ -33,7 +32,7 @@ port = "9999`)
 		}
 	})
 	t.Run("error message contains toml error with line number", func(t *testing.T) {
-		expectedError := "toml: line 2"
+		expectedError := "toml: line 1"
 		if err != nil && !strings.HasPrefix(err.Error(), expectedError) {
 			t.Fatalf("Expected error message '%s' to contain line number, got %v", expectedError, err)
 		}
@@ -42,7 +41,6 @@ port = "9999`)
 
 func TestReadConfigValid(t *testing.T) {
 	validConfigPath := writeConfig(t, `
-log_level = 1
 port = "9999"
 sse_base_url = "https://example.com"
 
@@ -57,11 +55,6 @@ disabled_tools = ["tool3", "tool4"]
 		}
 		if config == nil {
 			t.Fatal("ReadConfig returned a nil config for a valid file")
-		}
-	})
-	t.Run("log_level parsed correctly", func(t *testing.T) {
-		if config.LogLevel != 1 {
-			t.Fatalf("Unexpected log level: %v", config.LogLevel)
 		}
 	})
 	t.Run("enabled_tools parsed correctly", func(t *testing.T) {
