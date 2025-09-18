@@ -10,6 +10,11 @@ import (
 	"github.com/mark3labs/mcp-go/server"
 )
 
+type ListProfilesResult struct {
+	Browser  string   `json:"browser_name"`
+	Profiles []string `json:"profiles"`
+}
+
 func (s *Server) initProfilesList() []server.ServerTool {
 	tools := []server.ServerTool{
 		{
@@ -17,7 +22,7 @@ func (s *Server) initProfilesList() []server.ServerTool {
 				mcp.WithDescription("List the available profiles for a browser"),
 				mcp.WithString(
 					"browser",
-					mcp.Description("The browser to list the profiles for"),
+					mcp.Description("The browser to list the profiles for. The list of browsers is returned by the `list_browsers` tool."),
 				),
 			),
 			Handler: s.listProfiles,
@@ -46,5 +51,8 @@ func (s *Server) listProfiles(_ context.Context, ctr mcp.CallToolRequest) (*mcp.
 	if err != nil {
 		return NewTextResult("", err), nil
 	}
-	return NewTextResult(strings.Join(profiles, ", "), nil), nil
+	return NewStructuredResult(strings.Join(profiles, ", "), ListProfilesResult{
+		Browser:  browserName,
+		Profiles: profiles,
+	}, nil), nil
 }

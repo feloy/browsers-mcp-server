@@ -12,6 +12,18 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type ListSearchEngineQueriesResult struct {
+	Browser string                  `json:"browser_name"`
+	Profile string                  `json:"profile_name"`
+	Queries []api.SearchEngineQuery `json:"queries"`
+}
+
+type ListVisitedPagesFromSearchEngineQueryResult struct {
+	Browser string                                 `json:"browser_name"`
+	Profile string                                 `json:"profile_name"`
+	Pages   []api.VisitedPageFromSearchEngineQuery `json:"visited_pages"`
+}
+
 func (s *Server) initSearchEngineQueries() []server.ServerTool {
 	tools := []server.ServerTool{
 		{
@@ -19,11 +31,11 @@ func (s *Server) initSearchEngineQueries() []server.ServerTool {
 				mcp.WithDescription("list queries in search engines"),
 				mcp.WithString(
 					"browser",
-					mcp.Description("The browser to list the search engine queries for"),
+					mcp.Description("The browser to list the search engine queries for. The list of browsers is returned by the `list_browsers` tool."),
 				),
 				mcp.WithString(
 					"profile",
-					mcp.Description("The browser's profile to list the search engine queries for, required if there are multiple profiles"),
+					mcp.Description("The browser's profile to list the search engine queries for, required if there are multiple profiles. The list of profiles is returned by the `list_profiles` tool."),
 				),
 				mcp.WithString(
 					"start_time",
@@ -41,11 +53,11 @@ func (s *Server) initSearchEngineQueries() []server.ServerTool {
 				mcp.WithDescription("list visited pages from a search engine query"),
 				mcp.WithString(
 					"browser",
-					mcp.Description("The browser to list the visited pages for"),
+					mcp.Description("The browser to list the visited pages for. The list of browsers is returned by the `list_browsers` tool."),
 				),
 				mcp.WithString(
 					"profile",
-					mcp.Description("The browser's profile to list the visited pages for, required if there are multiple profiles"),
+					mcp.Description("The browser's profile to list the visited pages for, required if there are multiple profiles. The list of profiles is returned by the `list_profiles` tool."),
 				),
 				mcp.WithString(
 					"query",
@@ -105,7 +117,11 @@ func (s *Server) listSearchEngineQueries(_ context.Context, ctr mcp.CallToolRequ
 		return NewTextResult("", err), nil
 	}
 
-	return NewTextResult(fmt.Sprintf("The following search queries (YAML format) were found:\n%s", string(yamlSearchEngineQueries)), nil), nil
+	return NewStructuredResult(fmt.Sprintf("The following search queries (YAML format) were found:\n%s", string(yamlSearchEngineQueries)), ListSearchEngineQueriesResult{
+		Browser: browserName,
+		Profile: profileName,
+		Queries: searchEngineQueries,
+	}, nil), nil
 }
 
 func (s *Server) listVisitedPagesFromSearchEngineQuery(_ context.Context, ctr mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -147,5 +163,9 @@ func (s *Server) listVisitedPagesFromSearchEngineQuery(_ context.Context, ctr mc
 		return NewTextResult("", err), nil
 	}
 
-	return NewTextResult(fmt.Sprintf("The following visited pages (YAML format) were found:\n%s", string(yamlVisitedPages)), nil), nil
+	return NewStructuredResult(fmt.Sprintf("The following visited pages (YAML format) were found:\n%s", string(yamlVisitedPages)), ListVisitedPagesFromSearchEngineQueryResult{
+		Browser: browserName,
+		Profile: profileName,
+		Pages:   visitedPages,
+	}, nil), nil
 }

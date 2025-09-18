@@ -97,6 +97,12 @@ func NewTextResult(content string, err error) *mcp.CallToolResult {
 	}
 }
 
+func NewStructuredResult(content string, structuredContent any, err error) *mcp.CallToolResult {
+	result := NewTextResult(content, err)
+	result.StructuredContent = structuredContent
+	return result
+}
+
 func toolCallLoggingMiddleware(next server.ToolHandlerFunc) server.ToolHandlerFunc {
 	return func(ctx context.Context, ctr mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		klog.V(5).Infof("mcp tool call: %s(%v)", ctr.Params.Name, ctr.Params.Arguments)
