@@ -45,12 +45,10 @@ func TestListSearchEngineHistory(t *testing.T) {
 			},
 		},
 	})
-	_ = browser3
 
 	for _, tt := range []struct {
 		name                                   string
 		browsers                               []*test.Browser
-		parameters                             map[string]interface{}
 		expected_tools_count                   int
 		expected_names                         []string
 		expected_descriptions                  []string

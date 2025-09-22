@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"time"
 
+	_ "modernc.org/sqlite"
+
 	"github.com/charmbracelet/log"
 	"github.com/feloy/browsers-mcp-server/pkg/api"
 )
