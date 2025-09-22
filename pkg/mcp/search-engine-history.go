@@ -2,9 +2,12 @@ package mcp
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/feloy/browsers-mcp-server/pkg/api"
 	"github.com/feloy/browsers-mcp-server/pkg/browsers"
 	"github.com/mark3labs/mcp-go/mcp"
@@ -13,18 +16,71 @@ import (
 )
 
 func (s *Server) initSearchEngineQueries() []server.ServerTool {
-	tools := []server.ServerTool{
-		{
-			Tool: mcp.NewTool("list_search_engine_queries",
-				mcp.WithDescription("list queries in search engines"),
-				mcp.WithString(
-					"browser",
-					mcp.Description("The browser to list the search engine queries for"),
-				),
-				mcp.WithString(
-					"profile",
-					mcp.Description("The browser's profile to list the search engine queries for, required if there are multiple profiles"),
-				),
+	tools := []server.ServerTool{}
+	listSearchEngineTool, err := s.getListSearchEngineQueries()
+	if err == nil {
+		tools = append(tools, listSearchEngineTool...)
+	}
+	listVisitedPagesFromSearchEngineQueryTool, err := s.getListVisitedPagesFromSearchEngineQuery()
+	if err == nil {
+		tools = append(tools, listVisitedPagesFromSearchEngineQueryTool...)
+	}
+
+	var toolsNames []string
+	for _, tool := range tools {
+		toolsNames = append(toolsNames, tool.Tool.Name)
+	}
+	log.Info(fmt.Sprintf("registering %d tools in initSearchEngineQueries: %s", len(tools), strings.Join(toolsNames, ", ")))
+	return tools
+}
+
+func (s *Server) getListSearchEngineQueries() ([]server.ServerTool, error) {
+	browsers := browsers.GetBrowsers()
+	if len(browsers) == 1 {
+		profiles, err := browsers[0].Profiles()
+		if err != nil {
+			return nil, err
+		}
+		options := []mcp.ToolOption{}
+		options = append(options, mcp.WithDescription("list queries in search engines"))
+		if len(profiles) > 1 {
+			options = append(options, mcp.WithString("profile",
+				mcp.Description(fmt.Sprintf("The browser's profile to list the search engine queries for, possible values are %s", strings.Join(profiles, ", ")))))
+		}
+		options = append(
+			options,
+			mcp.WithString(
+				"start_time",
+				mcp.Description("List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight"),
+			),
+			mcp.WithNumber(
+				"limit",
+				mcp.Description("The maximum number of search engine queries to list, default is 10"),
+				mcp.DefaultNumber(10),
+			),
+		)
+		return []server.ServerTool{
+			{
+				Tool:    mcp.NewTool("list_search_engine_queries", options...),
+				Handler: s.listSearchEnginesQueriesByBrowser(nil),
+			},
+		}, nil
+	} else {
+		var tools []server.ServerTool
+		for _, browser := range browsers {
+			browserName := browser.Name()
+			profiles, err := browser.Profiles()
+			if err != nil {
+				return nil, err
+			}
+			options := []mcp.ToolOption{}
+			options = append(options, mcp.WithDescription(fmt.Sprintf("list queries in search engines in browser %s", browser.Name())))
+			if len(profiles) > 1 {
+				options = append(options, mcp.WithString("profile",
+					mcp.Description(fmt.Sprintf("The %s's profile to list the search engine queries for, possible values are %s", browser.Name(), strings.Join(profiles, ", ")))))
+			}
+			options = append(
+				options,
 				mcp.WithString(
 					"start_time",
 					mcp.Description("List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight"),
@@ -34,19 +90,63 @@ func (s *Server) initSearchEngineQueries() []server.ServerTool {
 					mcp.Description("The maximum number of search engine queries to list, default is 10"),
 					mcp.DefaultNumber(10),
 				),
+			)
+			tools = append(tools, server.ServerTool{
+				Tool:    mcp.NewTool(fmt.Sprintf("list_search_engine_queries_%s", browser.Name()), options...),
+				Handler: s.listSearchEnginesQueriesByBrowser(&browserName),
+			})
+		}
+		return tools, nil
+	}
+}
+
+func (s *Server) getListVisitedPagesFromSearchEngineQuery() ([]server.ServerTool, error) {
+	browsers := browsers.GetBrowsers()
+	if len(browsers) == 1 {
+		profiles, err := browsers[0].Profiles()
+		if err != nil {
+			return nil, err
+		}
+		options := []mcp.ToolOption{}
+		options = append(options, mcp.WithDescription("list the pages visited after doing a specific query in a search engine"))
+		if len(profiles) > 1 {
+			options = append(options, mcp.WithString("profile",
+				mcp.Description(fmt.Sprintf("The browser's profile to list the visited pages for, possible values are %s", strings.Join(profiles, ", ")))))
+		}
+		options = append(
+			options,
+			mcp.WithString(
+				"query",
+				mcp.Description("The query string to list the visited pages for"),
+				mcp.Required(),
 			),
-			Handler: s.listSearchEngineQueries,
-		}, {
-			Tool: mcp.NewTool("list_visited_pages_from_search_engine_query",
-				mcp.WithDescription("list visited pages from a search engine query"),
-				mcp.WithString(
-					"browser",
-					mcp.Description("The browser to list the visited pages for"),
-				),
-				mcp.WithString(
-					"profile",
-					mcp.Description("The browser's profile to list the visited pages for, required if there are multiple profiles"),
-				),
+			mcp.WithString(
+				"start_time",
+				mcp.Description("List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight"),
+			),
+		)
+		return []server.ServerTool{
+			{
+				Tool:    mcp.NewTool("list_visited_pages_from_search_engine_query", options...),
+				Handler: s.listVisitedPagesFromSearchEngineQueryByBrowser(nil),
+			},
+		}, nil
+	} else {
+		var tools []server.ServerTool
+		for _, browser := range browsers {
+			browserName := browser.Name()
+			profiles, err := browser.Profiles()
+			if err != nil {
+				return nil, err
+			}
+			options := []mcp.ToolOption{}
+			options = append(options, mcp.WithDescription(fmt.Sprintf("list the pages visited after doing a specific query in a search engine in browser %s", browser.Name())))
+			if len(profiles) > 1 {
+				options = append(options, mcp.WithString("profile",
+					mcp.Description(fmt.Sprintf("The %s's profile to list the visited pages for, possible values are %s", browser.Name(), strings.Join(profiles, ", ")))))
+			}
+			options = append(
+				options,
 				mcp.WithString(
 					"query",
 					mcp.Description("The query string to list the visited pages for"),
@@ -56,96 +156,112 @@ func (s *Server) initSearchEngineQueries() []server.ServerTool {
 					"start_time",
 					mcp.Description("List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight"),
 				),
-			),
-			Handler: s.listVisitedPagesFromSearchEngineQuery,
-		},
+			)
+			tools = append(tools, server.ServerTool{
+				Tool:    mcp.NewTool(fmt.Sprintf("list_visited_pages_from_search_engine_query_%s", browser.Name()), options...),
+				Handler: s.listVisitedPagesFromSearchEngineQueryByBrowser(&browserName),
+			})
+		}
+		return tools, nil
 	}
-	return tools
 }
 
-func (s *Server) listSearchEngineQueries(_ context.Context, ctr mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	browserName, err := s.getBrowserName(ctr, "search engine queries")
-	if err != nil {
-		return NewTextResult("", err), nil
-	}
-	browser, err := browsers.GetBrowserByName(browserName)
-	if err != nil {
-		return NewTextResult("", err), nil
-	}
-
-	profileName, err := s.getProfileName(browser, ctr, "search engine queries")
-	if err != nil {
-		return NewTextResult("", err), nil
-	}
-
-	var startTime *time.Time
-	if startTimeStr, ok := ctr.GetArguments()["start_time"].(string); ok {
-		t, err := time.Parse(time.DateTime, startTimeStr)
+func (s *Server) listSearchEnginesQueriesByBrowser(browserName *string) func(_ context.Context, ctr mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	return func(_ context.Context, ctr mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		if browserName == nil {
+			browsersList := browsers.GetBrowsers()
+			if len(browsersList) != 1 {
+				return nil, errors.New("more than one browser found, this is not expected")
+			}
+			name := browsersList[0].Name()
+			browserName = &name
+		}
+		browser, err := browsers.GetBrowserByName(*browserName)
 		if err != nil {
 			return NewTextResult("", err), nil
 		}
-		startTime = &t
-	}
 
-	var limit int
-	if limitFloat, ok := ctr.GetArguments()["limit"].(float64); ok {
-		limit = int(limitFloat)
-	} else {
-		// should be set because of `mcp.DefaultNumber(10)` but this is not the case
-		limit = 10
-	}
-
-	searchEngineQueries, err := browser.SearchEngineQueries(profileName, api.SearchEngineOptions{StartTime: startTime, Limit: limit})
-	if err != nil {
-		return NewTextResult("", err), nil
-	}
-
-	yamlSearchEngineQueries, err := yaml.Marshal(searchEngineQueries)
-	if err != nil {
-		return NewTextResult("", err), nil
-	}
-
-	return NewTextResult(fmt.Sprintf("The following search queries (YAML format) were found:\n%s", string(yamlSearchEngineQueries)), nil), nil
-}
-
-func (s *Server) listVisitedPagesFromSearchEngineQuery(_ context.Context, ctr mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	browserName, err := s.getBrowserName(ctr, "visited pages from search engine query")
-	if err != nil {
-		return NewTextResult("", err), nil
-	}
-	browser, err := browsers.GetBrowserByName(browserName)
-	if err != nil {
-		return NewTextResult("", err), nil
-	}
-
-	profileName, err := s.getProfileName(browser, ctr, "visited pages from search engine query")
-	if err != nil {
-		return NewTextResult("", err), nil
-	}
-
-	var startTime *time.Time
-	if startTimeStr, ok := ctr.GetArguments()["start_time"].(string); ok {
-		t, err := time.Parse(time.DateTime, startTimeStr)
+		profileName, err := s.getProfileName(browser, ctr, "search engine queries")
 		if err != nil {
 			return NewTextResult("", err), nil
 		}
-		startTime = &t
-	}
 
-	query, ok := ctr.GetArguments()["query"].(string)
-	if !ok {
-		return NewTextResult("", fmt.Errorf("query is required")), nil
-	}
+		var startTime *time.Time
+		if startTimeStr, ok := ctr.GetArguments()["start_time"].(string); ok {
+			t, err := time.Parse(time.DateTime, startTimeStr)
+			if err != nil {
+				return NewTextResult("", err), nil
+			}
+			startTime = &t
+		}
 
-	visitedPages, err := browser.ListVisitedPagesFromSearchEngineQuery(profileName, api.ListVisitedPagesFromSearchEngineQueryOptions{StartTime: startTime, Query: query})
-	if err != nil {
-		return NewTextResult("", err), nil
-	}
+		var limit int
+		if limitFloat, ok := ctr.GetArguments()["limit"].(float64); ok {
+			limit = int(limitFloat)
+		} else {
+			// should be set because of `mcp.DefaultNumber(10)` but this is not the case
+			limit = 10
+		}
 
-	yamlVisitedPages, err := yaml.Marshal(visitedPages)
-	if err != nil {
-		return NewTextResult("", err), nil
-	}
+		searchEngineQueries, err := browser.SearchEngineQueries(profileName, api.SearchEngineOptions{StartTime: startTime, Limit: limit})
+		if err != nil {
+			return NewTextResult("", err), nil
+		}
 
-	return NewTextResult(fmt.Sprintf("The following visited pages (YAML format) were found:\n%s", string(yamlVisitedPages)), nil), nil
+		yamlSearchEngineQueries, err := yaml.Marshal(searchEngineQueries)
+		if err != nil {
+			return NewTextResult("", err), nil
+		}
+
+		return NewTextResult(fmt.Sprintf("The following search queries (YAML format) were found:\n%s", string(yamlSearchEngineQueries)), nil), nil
+	}
+}
+
+func (s *Server) listVisitedPagesFromSearchEngineQueryByBrowser(browserName *string) func(_ context.Context, ctr mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+
+	return func(_ context.Context, ctr mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		if browserName == nil {
+			browsersList := browsers.GetBrowsers()
+			if len(browsersList) != 1 {
+				return nil, errors.New("more than one browser found, this is not expected")
+			}
+			name := browsersList[0].Name()
+			browserName = &name
+		}
+		browser, err := browsers.GetBrowserByName(*browserName)
+		if err != nil {
+			return NewTextResult("", err), nil
+		}
+
+		profileName, err := s.getProfileName(browser, ctr, "visited pages from search engine query")
+		if err != nil {
+			return NewTextResult("", err), nil
+		}
+
+		var startTime *time.Time
+		if startTimeStr, ok := ctr.GetArguments()["start_time"].(string); ok {
+			t, err := time.Parse(time.DateTime, startTimeStr)
+			if err != nil {
+				return NewTextResult("", err), nil
+			}
+			startTime = &t
+		}
+
+		query, ok := ctr.GetArguments()["query"].(string)
+		if !ok {
+			return NewTextResult("", fmt.Errorf("query is required")), nil
+		}
+
+		visitedPages, err := browser.ListVisitedPagesFromSearchEngineQuery(profileName, api.ListVisitedPagesFromSearchEngineQueryOptions{StartTime: startTime, Query: query})
+		if err != nil {
+			return NewTextResult("", err), nil
+		}
+
+		yamlVisitedPages, err := yaml.Marshal(visitedPages)
+		if err != nil {
+			return NewTextResult("", err), nil
+		}
+
+		return NewTextResult(fmt.Sprintf("The following visited pages (YAML format) were found:\n%s", string(yamlVisitedPages)), nil), nil
+	}
 }
