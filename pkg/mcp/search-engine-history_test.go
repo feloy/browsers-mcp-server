@@ -1,7 +1,6 @@
 package mcp
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -10,8 +9,6 @@ import (
 	"github.com/feloy/browsers-mcp-server/pkg/browsers/test"
 	"github.com/feloy/browsers-mcp-server/pkg/config"
 	globaltest "github.com/feloy/browsers-mcp-server/pkg/test"
-	"github.com/google/go-cmp/cmp"
-	"github.com/mark3labs/mcp-go/mcp"
 )
 
 func TestListSearchEngineHistory(t *testing.T) {
@@ -48,64 +45,115 @@ func TestListSearchEngineHistory(t *testing.T) {
 			},
 		},
 	})
+	_ = browser3
 
 	for _, tt := range []struct {
-		name       string
-		browsers   []*test.Browser
-		parameters map[string]interface{}
-		expected   string
+		name                                   string
+		browsers                               []*test.Browser
+		parameters                             map[string]interface{}
+		expected_tools_count                   int
+		expected_names                         []string
+		expected_descriptions                  []string
+		expected_input_properties              [][]string
+		expected_input_properties_descriptions [][]string
 	}{
 		{
-			name:     "one available browser with one profile, no parameter passed",
-			browsers: []*test.Browser{browser1, browser2},
-			expected: `The following search queries (YAML format) were found:
-- query: where is charly
-  date: 2021-01-01T00:00:00Z
-  search_engine: Google
-`,
-		},
-		{
-			name:     "one available browser with two profiles, no parameter passed",
-			browsers: []*test.Browser{browser3, browser2},
-			expected: "failed to get search engine queries, multiple profiles found, please specify the profile",
-		},
-		{
-			name:     "two available browsers, no parameter passed",
-			browsers: []*test.Browser{browser1, browser3},
-			expected: "failed to get search engine queries, multiple browsers found, please specify the browser",
-		},
-		{
-			name:     "two available browsers, browser with 1 profile passed",
-			browsers: []*test.Browser{browser1, browser3},
-			parameters: map[string]interface{}{
-				"browser": "browser1",
+			name:                 "one available browser with one profile",
+			browsers:             []*test.Browser{browser1, browser2},
+			expected_tools_count: 2,
+			expected_names: []string{
+				"list_search_engine_queries",
+				"list_visited_pages_from_search_engine_query",
 			},
-			expected: `The following search queries (YAML format) were found:
-- query: where is charly
-  date: 2021-01-01T00:00:00Z
-  search_engine: Google
-`,
+			expected_descriptions: []string{
+				"list queries in search engines",
+				"list the pages visited after doing a specific query in a search engine",
+			},
+			expected_input_properties: [][]string{
+				{"start_time", "limit"},
+				{"query", "start_time"},
+			},
+			expected_input_properties_descriptions: [][]string{
+				{
+					"List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"The maximum number of search engine queries to list, default is 10",
+				},
+				{
+					"The query string to list the visited pages for",
+					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+				},
+			}},
+		{
+			name:                 "one available browser with several profiles",
+			browsers:             []*test.Browser{browser2, browser3},
+			expected_tools_count: 2,
+			expected_names: []string{
+				"list_search_engine_queries",
+				"list_visited_pages_from_search_engine_query",
+			},
+			expected_descriptions: []string{
+				"list queries in search engines",
+				"list the pages visited after doing a specific query in a search engine",
+			},
+			expected_input_properties: [][]string{
+				{"profile", "start_time", "limit"},
+				{"profile", "query", "start_time"},
+			},
+			expected_input_properties_descriptions: [][]string{
+				{
+					"The browser's profile to list the search engine queries for, possible values are profile3a, profile3b",
+					"List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"The maximum number of search engine queries to list, default is 10",
+				},
+				{
+					"The browser's profile to list the visited pages for, possible values are profile3a, profile3b",
+					"The query string to list the visited pages for",
+					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+				},
+			},
 		},
 		{
-			name:     "two available browsers, browser with 2 profiles passed",
-			browsers: []*test.Browser{browser1, browser3},
-			parameters: map[string]interface{}{
-				"browser": "browser3",
+			name:                 "two available browsers with one or several profiles",
+			browsers:             []*test.Browser{browser1, browser2, browser3},
+			expected_tools_count: 4,
+			expected_names: []string{
+				"list_search_engine_queries_browser1",
+				"list_search_engine_queries_browser3",
+				"list_visited_pages_from_search_engine_query_browser1",
+				"list_visited_pages_from_search_engine_query_browser3",
 			},
-			expected: "failed to get search engine queries, multiple profiles found, please specify the profile",
-		},
-		{
-			name:     "two available browsers, browser with 2 profiles passed, profile parameter passed",
-			browsers: []*test.Browser{browser1, browser3},
-			parameters: map[string]interface{}{
-				"browser": "browser3",
-				"profile": "profile3a",
+			expected_descriptions: []string{
+				"list queries in search engines in browser browser1",
+				"list queries in search engines in browser browser3",
+				"list the pages visited after doing a specific query in a search engine in browser browser1",
+				"list the pages visited after doing a specific query in a search engine in browser browser3",
 			},
-			expected: `The following search queries (YAML format) were found:
-- query: what is it
-  date: 2023-01-01T00:00:00Z
-  search_engine: Google
-`,
+			expected_input_properties: [][]string{
+				{"start_time", "limit"},
+				{"profile", "start_time", "limit"},
+				{"query", "start_time"},
+				{"profile", "query", "start_time"},
+			},
+			expected_input_properties_descriptions: [][]string{
+				{
+					"List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"The maximum number of search engine queries to list, default is 10",
+				},
+				{
+					"The browser3's profile to list the search engine queries for, possible values are profile3a, profile3b",
+					"List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"The maximum number of search engine queries to list, default is 10",
+				},
+				{
+					"The query string to list the visited pages for",
+					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+				},
+				{
+					"The browser3's profile to list the visited pages for, possible values are profile3a, profile3b",
+					"The query string to list the visited pages for",
+					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+				},
+			},
 		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
@@ -116,24 +164,45 @@ func TestListSearchEngineHistory(t *testing.T) {
 			server, err := NewServer(Configuration{
 				Profile: &FullProfile{},
 				StaticConfig: &config.StaticConfig{
-					EnabledTools: []string{"list_bookmarks"},
+					EnabledTools: []string{"list_search_engine_queries"},
 				},
 			})
 			if err != nil {
 				t.Fatalf("Failed to create server: %v", err)
 			}
-			ctr := mcp.CallToolRequest{}
-			ctr.Params.Arguments = tt.parameters
-			result, err := server.listSearchEngineQueries(context.Background(), ctr)
-			if err != nil {
-				t.Fatalf("Failed to list search engine queries: %v", err)
+			tools := server.initSearchEngineQueries()
+			if len(tools) != tt.expected_tools_count {
+				t.Fatalf("Expected %d tools, got %d", tt.expected_tools_count, len(tools))
 			}
-			if len(result.Content) != 1 {
-				t.Fatalf("Expected 1 result, got %d", len(result.Content))
-			}
-			text := result.Content[0].(mcp.TextContent).Text
-			if text != tt.expected {
-				t.Fatalf("Content differs:\n%s", cmp.Diff(tt.expected, text))
+			for i, tool := range tools {
+				if tool.Tool.Name != tt.expected_names[i] {
+					t.Fatalf("Expected tool name #%d to be %s, but is %s", i, tt.expected_names[i], tool.Tool.Name)
+				}
+				if tool.Tool.Description != tt.expected_descriptions[i] {
+					t.Fatalf("Expected tool description #%d to be %s, but is %s", i, tt.expected_descriptions[i], tool.Tool.Description)
+				}
+				if len(tool.Tool.InputSchema.Properties) != len(tt.expected_input_properties[i]) {
+					t.Fatalf("Expected input properties count #%d to be %d, but is %d", i, len(tt.expected_input_properties[i]), len(tool.Tool.InputSchema.Properties))
+				}
+				for j, property := range tt.expected_input_properties[i] {
+					var foundProperty any
+					var found bool
+					if foundProperty, found = tool.Tool.InputSchema.Properties[property]; !found {
+						t.Fatalf("expected property %s not found", property)
+					}
+					var option map[string]any
+					var ok bool
+					if option, ok = foundProperty.(map[string]any); !ok {
+						t.Fatalf("cast error")
+					}
+					var description string
+					if description, ok = option["description"].(string); !ok {
+						t.Fatalf("description cast error")
+					}
+					if description != tt.expected_input_properties_descriptions[i][j] {
+						t.Fatalf("expected property description %q, got %q", tt.expected_input_properties_descriptions[i][j], description)
+					}
+				}
 			}
 		})
 	}
