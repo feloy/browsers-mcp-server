@@ -76,17 +76,17 @@ func TestListSearchEngineHistory(t *testing.T) {
 				"list the pages visited after doing a specific query in a search engine",
 			},
 			expected_input_properties: [][]string{
-				{"start_time", "limit"},
-				{"query", "start_time"},
+				{"day", "limit"},
+				{"query", "day"},
 			},
 			expected_input_properties_descriptions: [][]string{
 				{
-					"List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"List the search engine queries done on this day (YYYY-MM-DD), default is today",
 					"The maximum number of search engine queries to list, default is 10",
 				},
 				{
 					"The query string to list the visited pages for",
-					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"List the visited pages for queries done on this day (YYYY-MM-DD), default is today",
 				},
 			},
 			toolName:   "list_search_engine_queries",
@@ -111,19 +111,19 @@ func TestListSearchEngineHistory(t *testing.T) {
 				"list the pages visited after doing a specific query in a search engine",
 			},
 			expected_input_properties: [][]string{
-				{"profile", "start_time", "limit"},
-				{"profile", "query", "start_time"},
+				{"profile", "day", "limit"},
+				{"profile", "query", "day"},
 			},
 			expected_input_properties_descriptions: [][]string{
 				{
 					"The browser's profile to list the search engine queries for, possible values are profile3a, profile3b",
-					"List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"List the search engine queries done on this day (YYYY-MM-DD), default is today",
 					"The maximum number of search engine queries to list, default is 10",
 				},
 				{
 					"The browser's profile to list the visited pages for, possible values are profile3a, profile3b",
 					"The query string to list the visited pages for",
-					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"List the visited pages for queries done on this day (YYYY-MM-DD), default is today",
 				},
 			},
 			toolName: "list_search_engine_queries",
@@ -153,29 +153,29 @@ func TestListSearchEngineHistory(t *testing.T) {
 				"list the pages visited after doing a specific query in a search engine in browser browser3",
 			},
 			expected_input_properties: [][]string{
-				{"start_time", "limit"},
-				{"profile", "start_time", "limit"},
-				{"query", "start_time"},
-				{"profile", "query", "start_time"},
+				{"day", "limit"},
+				{"profile", "day", "limit"},
+				{"query", "day"},
+				{"profile", "query", "day"},
 			},
 			expected_input_properties_descriptions: [][]string{
 				{
-					"List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"List the search engine queries done on this day (YYYY-MM-DD), default is today",
 					"The maximum number of search engine queries to list, default is 10",
 				},
 				{
 					"The browser3's profile to list the search engine queries for, possible values are profile3a, profile3b",
-					"List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"List the search engine queries done on this day (YYYY-MM-DD), default is today",
 					"The maximum number of search engine queries to list, default is 10",
 				},
 				{
 					"The query string to list the visited pages for",
-					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"List the visited pages for queries done on this day (YYYY-MM-DD), default is today",
 				},
 				{
 					"The browser3's profile to list the visited pages for, possible values are profile3a, profile3b",
 					"The query string to list the visited pages for",
-					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
+					"List the visited pages for queries done on this day (YYYY-MM-DD), default is today",
 				},
 			},
 			toolName: "list_search_engine_queries_browser3",

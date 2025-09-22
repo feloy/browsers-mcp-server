@@ -6,6 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/andrewarchi/browser v0.0.0-20210602185959-ae587407e71c
 	github.com/charmbracelet/log v0.4.2
+	github.com/google/go-cmp v0.7.0
 	github.com/mark3labs/mcp-go v0.39.1
 	github.com/spf13/afero v1.14.0
 	github.com/spf13/cobra v1.10.1
@@ -28,7 +29,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
-	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/invopop/jsonschema v0.13.0 // indirect

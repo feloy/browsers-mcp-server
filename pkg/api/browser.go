@@ -18,7 +18,8 @@ type SearchEngineQuery struct {
 }
 
 type SearchEngineOptions struct {
-	StartTime *time.Time
+	StartTime time.Time
+	EndTime   time.Time
 	Limit     int
 }
 
@@ -31,7 +32,8 @@ type VisitedPageFromSearchEngineQuery struct {
 
 type ListVisitedPagesFromSearchEngineQueryOptions struct {
 	Query     string
-	StartTime *time.Time
+	StartTime time.Time
+	EndTime   time.Time
 }
 
 type Browser interface {

@@ -50,8 +50,8 @@ func (s *Server) getListSearchEngineQueries() ([]server.ServerTool, error) {
 		options = append(
 			options,
 			mcp.WithString(
-				"start_time",
-				mcp.Description("List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight"),
+				"day",
+				mcp.Description("List the search engine queries done on this day (YYYY-MM-DD), default is today"),
 			),
 			mcp.WithNumber(
 				"limit",
@@ -82,8 +82,8 @@ func (s *Server) getListSearchEngineQueries() ([]server.ServerTool, error) {
 			options = append(
 				options,
 				mcp.WithString(
-					"start_time",
-					mcp.Description("List the search engine queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight"),
+					"day",
+					mcp.Description("List the search engine queries done on this day (YYYY-MM-DD), default is today"),
 				),
 				mcp.WithNumber(
 					"limit",
@@ -121,8 +121,8 @@ func (s *Server) getListVisitedPagesFromSearchEngineQuery() ([]server.ServerTool
 				mcp.Required(),
 			),
 			mcp.WithString(
-				"start_time",
-				mcp.Description("List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight"),
+				"day",
+				mcp.Description("List the visited pages for queries done on this day (YYYY-MM-DD), default is today"),
 			),
 		)
 		return []server.ServerTool{
@@ -153,8 +153,8 @@ func (s *Server) getListVisitedPagesFromSearchEngineQuery() ([]server.ServerTool
 					mcp.Required(),
 				),
 				mcp.WithString(
-					"start_time",
-					mcp.Description("List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight"),
+					"day",
+					mcp.Description("List the visited pages for queries done on this day (YYYY-MM-DD), default is today"),
 				),
 			)
 			tools = append(tools, server.ServerTool{
@@ -186,13 +186,18 @@ func (s *Server) listSearchEnginesQueriesByBrowser(browserName *string) func(_ c
 			return NewTextResult("", err), nil
 		}
 
-		var startTime *time.Time
-		if startTimeStr, ok := ctr.GetArguments()["start_time"].(string); ok {
-			t, err := time.Parse(time.DateTime, startTimeStr)
+		var startTime time.Time
+		var endTime time.Time
+		if startDayStr, ok := ctr.GetArguments()["day"].(string); ok {
+			t, err := time.Parse(time.DateOnly, startDayStr)
 			if err != nil {
 				return NewTextResult("", err), nil
 			}
-			startTime = &t
+			startTime = t
+			endTime = t.AddDate(0, 0, 1)
+		} else {
+			startTime = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location())
+			endTime = startTime.AddDate(0, 0, 1)
 		}
 
 		var limit int
@@ -203,7 +208,7 @@ func (s *Server) listSearchEnginesQueriesByBrowser(browserName *string) func(_ c
 			limit = 10
 		}
 
-		searchEngineQueries, err := browser.SearchEngineQueries(profileName, api.SearchEngineOptions{StartTime: startTime, Limit: limit})
+		searchEngineQueries, err := browser.SearchEngineQueries(profileName, api.SearchEngineOptions{StartTime: startTime, EndTime: endTime, Limit: limit})
 		if err != nil {
 			return NewTextResult("", err), nil
 		}
@@ -238,13 +243,15 @@ func (s *Server) listVisitedPagesFromSearchEngineQueryByBrowser(browserName *str
 			return NewTextResult("", err), nil
 		}
 
-		var startTime *time.Time
-		if startTimeStr, ok := ctr.GetArguments()["start_time"].(string); ok {
-			t, err := time.Parse(time.DateTime, startTimeStr)
+		var startTime time.Time
+		var endTime time.Time
+		if startDayStr, ok := ctr.GetArguments()["day"].(string); ok {
+			t, err := time.Parse(time.DateOnly, startDayStr)
 			if err != nil {
 				return NewTextResult("", err), nil
 			}
-			startTime = &t
+			startTime = t
+			endTime = t.AddDate(0, 0, 1)
 		}
 
 		query, ok := ctr.GetArguments()["query"].(string)
@@ -252,7 +259,7 @@ func (s *Server) listVisitedPagesFromSearchEngineQueryByBrowser(browserName *str
 			return NewTextResult("", fmt.Errorf("query is required")), nil
 		}
 
-		visitedPages, err := browser.ListVisitedPagesFromSearchEngineQuery(profileName, api.ListVisitedPagesFromSearchEngineQueryOptions{StartTime: startTime, Query: query})
+		visitedPages, err := browser.ListVisitedPagesFromSearchEngineQuery(profileName, api.ListVisitedPagesFromSearchEngineQueryOptions{StartTime: startTime, EndTime: endTime, Query: query})
 		if err != nil {
 			return NewTextResult("", err), nil
 		}
