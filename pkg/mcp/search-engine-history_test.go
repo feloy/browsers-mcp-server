@@ -1,6 +1,7 @@
 package mcp
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -9,6 +10,9 @@ import (
 	"github.com/feloy/browsers-mcp-server/pkg/browsers/test"
 	"github.com/feloy/browsers-mcp-server/pkg/config"
 	globaltest "github.com/feloy/browsers-mcp-server/pkg/test"
+	"github.com/google/go-cmp/cmp"
+	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/mark3labs/mcp-go/server"
 )
 
 func TestListSearchEngineHistory(t *testing.T) {
@@ -54,6 +58,10 @@ func TestListSearchEngineHistory(t *testing.T) {
 		expected_descriptions                  []string
 		expected_input_properties              [][]string
 		expected_input_properties_descriptions [][]string
+
+		toolName   string
+		parameters map[string]interface{}
+		expected   string
 	}{
 		{
 			name:                 "one available browser with one profile",
@@ -80,7 +88,16 @@ func TestListSearchEngineHistory(t *testing.T) {
 					"The query string to list the visited pages for",
 					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
 				},
-			}},
+			},
+			toolName:   "list_search_engine_queries",
+			parameters: map[string]interface{}{},
+			expected: `The following search queries (YAML format) were found:
+- query: where is charly
+  date: 2021-01-01T00:00:00Z
+  search_engine: Google
+`,
+		},
+
 		{
 			name:                 "one available browser with several profiles",
 			browsers:             []*test.Browser{browser2, browser3},
@@ -109,6 +126,15 @@ func TestListSearchEngineHistory(t *testing.T) {
 					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
 				},
 			},
+			toolName: "list_search_engine_queries",
+			parameters: map[string]interface{}{
+				"profile": "profile3a",
+			},
+			expected: `The following search queries (YAML format) were found:
+- query: what is it
+  date: 2023-01-01T00:00:00Z
+  search_engine: Google
+`,
 		},
 		{
 			name:                 "two available browsers with one or several profiles",
@@ -152,6 +178,15 @@ func TestListSearchEngineHistory(t *testing.T) {
 					"List the visited pages for queries from this time (YYYY-MM-DD HH:MM:SS), default is today at midnight",
 				},
 			},
+			toolName: "list_search_engine_queries_browser3",
+			parameters: map[string]interface{}{
+				"profile": "profile3a",
+			},
+			expected: `The following search queries (YAML format) were found:
+- query: what is it
+  date: 2023-01-01T00:00:00Z
+  search_engine: Google
+`,
 		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
@@ -159,7 +194,7 @@ func TestListSearchEngineHistory(t *testing.T) {
 			for _, browser := range tt.browsers {
 				browsers.Register(browser)
 			}
-			server, err := NewServer(Configuration{
+			srv, err := NewServer(Configuration{
 				Profile: &FullProfile{},
 				StaticConfig: &config.StaticConfig{
 					EnabledTools: []string{"list_search_engine_queries"},
@@ -168,10 +203,11 @@ func TestListSearchEngineHistory(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Failed to create server: %v", err)
 			}
-			tools := server.initSearchEngineQueries()
+			tools := srv.initSearchEngineQueries()
 			if len(tools) != tt.expected_tools_count {
 				t.Fatalf("Expected %d tools, got %d", tt.expected_tools_count, len(tools))
 			}
+			// Check API
 			for i, tool := range tools {
 				if tool.Tool.Name != tt.expected_names[i] {
 					t.Fatalf("Expected tool name #%d to be %s, but is %s", i, tt.expected_names[i], tool.Tool.Name)
@@ -201,6 +237,33 @@ func TestListSearchEngineHistory(t *testing.T) {
 						t.Fatalf("expected property description %q, got %q", tt.expected_input_properties_descriptions[i][j], description)
 					}
 				}
+			}
+
+			// Test call
+			var tool server.ServerTool
+			var found = false
+			for _, tool = range tools {
+				if tool.Tool.Name == tt.toolName {
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Fatalf("tool %s not found", tt.toolName)
+			}
+			ctr := mcp.CallToolRequest{}
+			ctr.Params.Arguments = tt.parameters
+			var result *mcp.CallToolResult
+			result, err = tool.Handler(context.Background(), ctr)
+			if err != nil {
+				t.Fatalf("Failed to call tool: %v", err)
+			}
+			if len(result.Content) != 1 {
+				t.Fatalf("Expected 1 result, got %d", len(result.Content))
+			}
+			text := result.Content[0].(mcp.TextContent).Text
+			if text != tt.expected {
+				t.Fatalf("Content differs:\n%s", cmp.Diff(tt.expected, text))
 			}
 		})
 	}
