@@ -6,42 +6,27 @@ Supported browsers: Chrome, Firefox.
 
 ## Tools
 
-### list_browsers
+### list_bookmarks, list_bookmarks_browserName
 
-List discovered browsers.
-
-### list_profiles
-
-List profiles for a specific browser.
-
-Parameters: 
-- `browser` (`string`, optional): the browser name (as returned by `list_browsers`). Required if `list_browsers` returns several browsers.
-
-### list_bookmarks
-
-List bookmarks for a given profile of a given browser.
+List bookmarks for a given profile of a given browser. `list_bookmarks` is provided if only one browser is found. A set of `list_bookmarks_browserName` are provided when several browsers are detected, one for each browser.
 
 Parameters:
-- `browser` (`string`, optional): the browser name (as returned by `list_browsers`). Required if `list_browsers` returns several browsers.
-- `profile` (`string`, optional): the profile name (as returned by `list_profiles`). Required if `list_profiles` returns several profiles for the given browser.
+- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
 
-### list_search_engine_queries
+### list_search_engine_queries, list_search_engine_queries_browserName
 
-List the queries in search engines (supported search engines: Google).
+List the queries in search engines (supported search engines: Google). `list_search_engine_queries` is provided if only one browser is found. A set of `list_search_engine_queries_browserName` are provided when several browsers are detected, one for each browser.
 
 Parameters:
-- `browser` (`string`, optional): the browser name (as returned by `list_browsers`). Required if `list_browsers` returns several browsers.
-- `profile` (`string`, optional): the profile name (as returned by `list_profiles`). Required if `list_profiles` returns several profiles for the given browser.
+- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
 - `start_time` (`string`, format `YYYY-MM-DD HH:MM:SS`, optional): list the search engine queries from this time, default is today at midnight.
 - `limit` (`number`, optional): the number of results to return, default is 10.
 
-### list_visited_pages_from_search_engine_query
+### list_visited_pages_from_search_engine_query, list_visited_pages_from_search_engine_query_browserName
 
-List the pages visited from a search engine query.
+List the pages visited from a search engine query. `list_visited_pages_from_search_engine_query` is provided if only one browser is found. A set of `list_visited_pages_from_search_engine_query_browserName` are provided when several browsers are detected, one for each browser.
 
-Parameters:
-- `browser` (`string`, optional): the browser name (as returned by `list_browsers`). Required if `list_browsers` returns several browsers.
-- `profile` (`string`, optional): the profile name (as returned by `list_profiles`). Required if `list_profiles` returns several profiles for the given browser.
+- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
 - `query` (`string`, required): the query string to list the visited pages for.
 - `start_time` (`string`, format `YYYY-MM-DD HH:MM:SS`, optional): list the search engine queries from this time, default is today at midnight.
 
