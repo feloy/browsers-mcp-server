@@ -1,6 +1,7 @@
 package mcp
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -9,6 +10,9 @@ import (
 	"github.com/feloy/browsers-mcp-server/pkg/browsers/test"
 	"github.com/feloy/browsers-mcp-server/pkg/config"
 	globaltest "github.com/feloy/browsers-mcp-server/pkg/test"
+	"github.com/google/go-cmp/cmp"
+	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/mark3labs/mcp-go/server"
 )
 
 func TestListBookmarks(t *testing.T) {
@@ -55,6 +59,10 @@ func TestListBookmarks(t *testing.T) {
 		expected_descriptions                  []string
 		expected_input_properties              [][]string
 		expected_input_properties_descriptions [][]string
+
+		toolName   string
+		parameters map[string]interface{}
+		expected   string
 	}{
 		{
 			name:                  "one available browser with one profile",
@@ -68,6 +76,16 @@ func TestListBookmarks(t *testing.T) {
 			expected_input_properties_descriptions: [][]string{
 				{},
 			},
+			toolName:   "list_bookmarks",
+			parameters: map[string]interface{}{},
+			expected: `The following bookmarks (YAML format) were found:
+- name: bookmark1a
+  url: https://www.bookmark1a.com
+  folder:
+    - folder1a
+  date_added: 2021-01-01T00:00:00Z
+  date_last_visited: 2021-04-01T00:00:00Z
+`,
 		},
 		{
 			name:                  "one available browser with two profiles",
@@ -81,6 +99,19 @@ func TestListBookmarks(t *testing.T) {
 			expected_input_properties_descriptions: [][]string{
 				{"The browser's profile to list the bookmarks for, possible values are profile3a, profile3b"},
 			},
+			toolName: "list_bookmarks",
+			parameters: map[string]interface{}{
+				"profile": "profile3a",
+			},
+			expected: `The following bookmarks (YAML format) were found:
+- name: bookmark3a
+  url: https://www.bookmark3a.com
+  folder:
+    - folder3a
+  date_added: 2023-01-01T00:00:00Z
+  date_modified: 2023-02-01T00:00:00Z
+  date_last_visited: 2023-04-01T00:00:00Z
+`,
 		},
 		{
 			name:                 "two available browsers with one or two profiles",
@@ -99,6 +130,19 @@ func TestListBookmarks(t *testing.T) {
 				{},
 				{"The browser's profile to list the bookmarks for, possible values are profile3a, profile3b"},
 			},
+			toolName: "list_bookmarks_browser3",
+			parameters: map[string]interface{}{
+				"profile": "profile3a",
+			},
+			expected: `The following bookmarks (YAML format) were found:
+- name: bookmark3a
+  url: https://www.bookmark3a.com
+  folder:
+    - folder3a
+  date_added: 2023-01-01T00:00:00Z
+  date_modified: 2023-02-01T00:00:00Z
+  date_last_visited: 2023-04-01T00:00:00Z
+`,
 		},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
@@ -106,7 +150,7 @@ func TestListBookmarks(t *testing.T) {
 			for _, browser := range tt.browsers {
 				browsers.Register(browser)
 			}
-			server, err := NewServer(Configuration{
+			srv, err := NewServer(Configuration{
 				Profile: &FullProfile{},
 				StaticConfig: &config.StaticConfig{
 					EnabledTools: []string{"list_bookmarks"},
@@ -115,7 +159,9 @@ func TestListBookmarks(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Failed to create server: %v", err)
 			}
-			tools := server.initBookmarksList()
+
+			// test API
+			tools := srv.initBookmarksList()
 			if len(tools) != tt.expected_tools_count {
 				t.Fatalf("Expected %d tools, got %d", tt.expected_tools_count, len(tools))
 			}
@@ -149,6 +195,34 @@ func TestListBookmarks(t *testing.T) {
 					}
 				}
 			}
+
+			// Test call
+			var tool server.ServerTool
+			var found = false
+			for _, tool = range tools {
+				if tool.Tool.Name == tt.toolName {
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Fatalf("tool %s not found", tt.toolName)
+			}
+			ctr := mcp.CallToolRequest{}
+			ctr.Params.Arguments = tt.parameters
+			var result *mcp.CallToolResult
+			result, err = tool.Handler(context.Background(), ctr)
+			if err != nil {
+				t.Fatalf("Failed to call tool: %v", err)
+			}
+			if len(result.Content) != 1 {
+				t.Fatalf("Expected 1 result, got %d", len(result.Content))
+			}
+			text := result.Content[0].(mcp.TextContent).Text
+			if text != tt.expected {
+				t.Fatalf("Content differs:\n%s", cmp.Diff(tt.expected, text))
+			}
 		})
+
 	}
 }

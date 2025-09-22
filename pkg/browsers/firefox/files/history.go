@@ -19,10 +19,8 @@ func SearchEngineQueries(profile string, isRelative bool, options api.SearchEngi
 	}
 	defer db.Close()
 
-	startTime := toDbDate(time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location()))
-	if options.StartTime != nil {
-		startTime = toDbDate(*options.StartTime)
-	}
+	startTime := toDbDate(options.StartTime)
+	endTime := toDbDate(options.EndTime)
 	rows, err := db.Query(`SELECT
   visit_date,
 	url 
@@ -30,8 +28,9 @@ FROM moz_historyvisits hv
 INNER JOIN moz_places p ON p.id = hv.place_id 
 WHERE url LIKE 'https://www.google.com/search%'
 AND hv.visit_date >= ?
+AND hv.visit_date < ?
 ORDER BY hv.visit_date ASC
-LIMIT ?`, startTime, options.Limit)
+LIMIT ?`, startTime, endTime, options.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -72,10 +71,8 @@ func ListVisitedPagesFromSearchEngineQuery(profile string, isRelative bool, opti
 	}
 	defer db.Close()
 
-	startTime := toDbDate(time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location()))
-	if options.StartTime != nil {
-		startTime = toDbDate(*options.StartTime)
-	}
+	startTime := toDbDate(options.StartTime)
+	endTime := toDbDate(options.EndTime)
 	rows, err := db.Query(`SELECT
   visited.visit_date,
 	visited_place.url,
@@ -87,7 +84,8 @@ INNER JOIN moz_places visited_place ON visited_place.id = visited.place_id
 WHERE p.url LIKE 'https://www.google.com/search%'
 AND (? = '' OR p.url like ? OR p.url like ?)
 AND hv.visit_date >= ?
-ORDER BY hv.visit_date ASC`, options.Query, "%q="+url.QueryEscape(options.Query)+"&%", "%q="+url.QueryEscape(options.Query), startTime)
+AND hv.visit_date < ?
+ORDER BY hv.visit_date ASC`, options.Query, "%q="+url.QueryEscape(options.Query)+"&%", "%q="+url.QueryEscape(options.Query), startTime, endTime)
 	if err != nil {
 		return nil, err
 	}

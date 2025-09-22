@@ -28,10 +28,8 @@ func SearchEngineQueries(profile string, options api.SearchEngineOptions) ([]api
 	}
 	defer db.Close()
 
-	startTime := toDbDate(time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location()))
-	if options.StartTime != nil {
-		startTime = toDbDate(*options.StartTime)
-	}
+	startTime := toDbDate(options.StartTime)
+	endTime := toDbDate(options.EndTime)
 	rows, err := db.Query(`SELECT 
 	visits.visit_time,
 	urls.url
@@ -40,8 +38,9 @@ INNER JOIN visits ON visits.url = urls.id
 WHERE 
 	urls.url like 'https://www.google.com/search%'
 	AND visits.visit_time >= ?
+	AND visits.visit_time < ?
 	ORDER BY visits.visit_time ASC
-LIMIT ?`, startTime, options.Limit)
+LIMIT ?`, startTime, endTime, options.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -82,10 +81,8 @@ func ListVisitedPagesFromSearchEngineQuery(profile string, options api.ListVisit
 	}
 	defer db.Close()
 
-	startTime := toDbDate(time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location()))
-	if options.StartTime != nil {
-		startTime = toDbDate(*options.StartTime)
-	}
+	startTime := toDbDate(options.StartTime)
+	endTime := toDbDate(options.EndTime)
 	rows, err := db.Query(`SELECT
 visited.visit_time,
 visited_url.url,
@@ -98,7 +95,8 @@ WHERE
   urls.url like 'https://www.google.com/search%'
 	AND (? = '' OR urls.url like ? OR urls.url like ?)
   AND visits.visit_time >= ?
-ORDER BY visits.visit_time ASC`, options.Query, "%q="+url.QueryEscape(options.Query)+"&%", "%q="+url.QueryEscape(options.Query), startTime)
+	AND visits.visit_time < ?
+ORDER BY visits.visit_time ASC`, options.Query, "%q="+url.QueryEscape(options.Query)+"&%", "%q="+url.QueryEscape(options.Query), startTime, endTime)
 	if err != nil {
 		return nil, err
 	}
