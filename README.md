@@ -19,7 +19,7 @@ List the queries in search engines (supported search engines: Google). `list_sea
 
 Parameters:
 - `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
-- `start_time` (`string`, format `YYYY-MM-DD HH:MM:SS`, optional): list the search engine queries from this time, default is today at midnight.
+- `day` (`string`, format `YYYY-MM-DD`, optional): list the search engine queries during this day, default is today.
 - `limit` (`number`, optional): the number of results to return, default is 10.
 
 ### list_visited_pages_from_search_engine_query, list_visited_pages_from_search_engine_query_browserName
@@ -28,7 +28,7 @@ List the pages visited from a search engine query. `list_visited_pages_from_sear
 
 - `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
 - `query` (`string`, required): the query string to list the visited pages for.
-- `start_time` (`string`, format `YYYY-MM-DD HH:MM:SS`, optional): list the search engine queries from this time, default is today at midnight.
+- `day` (`string`, format `YYYY-MM-DD`, optional): list the search engine queries during this day, default is today.
 
 
 ## Getting Started
