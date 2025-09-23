@@ -68,6 +68,19 @@ func (o *Chrome) ListVisitedPagesFromSearchEngineQuery(profileName string, optio
 	return nil, fmt.Errorf("profile %s not found", profileName)
 }
 
+func (o *Chrome) ListVisitedPagesFromSourceRepos(profileName string, options api.ListVisitedPagesFromSourceReposOptions) ([]api.VisitedPageFromSourceRepos, error) {
+	profiles, err := o.Profiles()
+	if err != nil {
+		return nil, err
+	}
+	for _, profile := range profiles {
+		if profile == profileName {
+			return files.ListVisitedPagesFromSourceRepos(profile, options)
+		}
+	}
+	return nil, fmt.Errorf("profile %s not found", profileName)
+}
+
 func init() {
 	browsers.Register(instance)
 }
