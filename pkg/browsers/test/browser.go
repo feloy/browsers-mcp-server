@@ -16,6 +16,8 @@ type Browser struct {
 	searchEngineQueriesError               error
 	visitedPagesFromSearchEngineQuery      []api.VisitedPageFromSearchEngineQuery
 	visitedPagesFromSearchEngineQueryError error
+	visitedPagesFromSourceRepos            []api.VisitedPageFromSourceRepos
+	visitedPagesFromSourceReposError       error
 }
 
 type NewBrowserOptions struct {
@@ -30,6 +32,8 @@ type NewBrowserOptions struct {
 	SearchEngineQueriesError               error
 	VisitedPagesFromSearchEngineQuery      []api.VisitedPageFromSearchEngineQuery
 	VisitedPagesFromSearchEngineQueryError error
+	VisitedPagesFromSourceRepos            []api.VisitedPageFromSourceRepos
+	VisitedPagesFromSourceReposError       error
 }
 
 func NewBrowser(options NewBrowserOptions) *Browser {
@@ -45,6 +49,8 @@ func NewBrowser(options NewBrowserOptions) *Browser {
 		searchEngineQueriesError:               options.SearchEngineQueriesError,
 		visitedPagesFromSearchEngineQuery:      options.VisitedPagesFromSearchEngineQuery,
 		visitedPagesFromSearchEngineQueryError: options.VisitedPagesFromSearchEngineQueryError,
+		visitedPagesFromSourceRepos:            options.VisitedPagesFromSourceRepos,
+		visitedPagesFromSourceReposError:       options.VisitedPagesFromSourceReposError,
 	}
 }
 
@@ -70,4 +76,8 @@ func (o *Browser) SearchEngineQueries(profile string, options api.SearchEngineOp
 
 func (o *Browser) ListVisitedPagesFromSearchEngineQuery(profile string, options api.ListVisitedPagesFromSearchEngineQueryOptions) ([]api.VisitedPageFromSearchEngineQuery, error) {
 	return o.visitedPagesFromSearchEngineQuery, o.visitedPagesFromSearchEngineQueryError
+}
+
+func (o *Browser) ListVisitedPagesFromSourceRepos(profile string, options api.ListVisitedPagesFromSourceReposOptions) ([]api.VisitedPageFromSourceRepos, error) {
+	return o.visitedPagesFromSourceRepos, o.visitedPagesFromSourceReposError
 }

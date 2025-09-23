@@ -2,7 +2,6 @@ package files
 
 import (
 	"net/url"
-	"time"
 
 	"github.com/feloy/browsers-mcp-server/pkg/api"
 )
@@ -107,11 +106,4 @@ ORDER BY hv.visit_date ASC`, options.Query, "%q="+url.QueryEscape(options.Query)
 		})
 	}
 	return visitedPages, nil
-}
-
-func fromDbDate(dbDate int64) time.Time {
-	return time.Unix(dbDate/1_000_000, 0)
-}
-func toDbDate(d time.Time) int64 {
-	return d.Unix() * 1_000_000
 }

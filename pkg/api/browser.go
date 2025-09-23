@@ -36,6 +36,38 @@ type ListVisitedPagesFromSearchEngineQueryOptions struct {
 	EndTime   time.Time
 }
 
+type SourceRepoPageType string
+
+const (
+	SourceRepoPageTypeUnset            SourceRepoPageType = ""
+	SourceRepoPageTypeProviderHome     SourceRepoPageType = "provider home"
+	SourceRepoPageTypeOrganizationHome SourceRepoPageType = "organization home"
+	SourceRepoPageTypeRepositoryHome   SourceRepoPageType = "repository home"
+	SourceRepoPageTypeIssuesList       SourceRepoPageType = "issues list"
+	SourceRepoPageTypePullRequestsList SourceRepoPageType = "pull requests list"
+	SourceRepoPageTypeDiscussionsList  SourceRepoPageType = "discussions list"
+	SourceRepoPageTypeIssue            SourceRepoPageType = "issue"
+	SourceRepoPageTypePullRequest      SourceRepoPageType = "pull request"
+	SourceRepoPageTypeDiscussion       SourceRepoPageType = "discussion"
+	SourceRepoPageTypeOtherDetails     SourceRepoPageType = "other details"
+)
+
+type VisitedPageFromSourceRepos struct {
+	Times        int                `yaml:"times"`
+	Provider     string             `yaml:"provider"` // github, ...
+	URL          string             `yaml:"url"`
+	Organization string             `yaml:"organization"`
+	Repository   string             `yaml:"repository"`
+	Type         SourceRepoPageType `yaml:"type"`             // provider home, issue, pull request, ...
+	Number       *string            `yaml:"number,omitempty"` // Depending on type: number of issue/PR/etc, not defined for home
+}
+
+type ListVisitedPagesFromSourceReposOptions struct {
+	Type      SourceRepoPageType
+	StartTime time.Time
+	EndTime   time.Time
+}
+
 type Browser interface {
 	Name() string
 	IsAvailable() (bool, error)
@@ -43,4 +75,5 @@ type Browser interface {
 	Bookmarks(profile string) ([]BookMark, error)
 	SearchEngineQueries(profile string, options SearchEngineOptions) ([]SearchEngineQuery, error)
 	ListVisitedPagesFromSearchEngineQuery(profile string, options ListVisitedPagesFromSearchEngineQueryOptions) ([]VisitedPageFromSearchEngineQuery, error)
+	ListVisitedPagesFromSourceRepos(profile string, options ListVisitedPagesFromSourceReposOptions) ([]VisitedPageFromSourceRepos, error)
 }

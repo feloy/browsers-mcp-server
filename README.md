@@ -30,6 +30,14 @@ List the pages visited from a search engine query. `list_visited_pages_from_sear
 - `query` (`string`, required): the query string to list the visited pages for.
 - `day` (`string`, format `YYYY-MM-DD`, optional): list the search engine queries during this day, default is today.
 
+### list_source_repos_visits, list_source_repos_visits_browserName
+
+List the pages visited in sources repositories. `list_source_repos_visits` is provided if only one browser is found. A set of `list_source_repos_visits_browserName` are provided when several browsers are detected, one for each browser.
+
+Parameters:
+- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
+- `day` (`string`, format `YYYY-MM-DD`, optional): list the visits during this day, default is today.
+- `type` (`string`): Type of pages to list (`provider home`, `organization home`, `repository home`, `issues list`, `pull requests list`, `discussions list`, `issue`, `pull request`, `discussion`)
 
 ## Getting Started
 
