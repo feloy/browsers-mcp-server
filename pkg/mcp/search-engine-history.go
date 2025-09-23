@@ -45,7 +45,10 @@ func (s *Server) getListSearchEngineQueries() ([]server.ServerTool, error) {
 		options = append(options, mcp.WithDescription("list queries in search engines"))
 		if len(profiles) > 1 {
 			options = append(options, mcp.WithString("profile",
-				mcp.Description(fmt.Sprintf("The browser's profile to list the search engine queries for, possible values are %s", strings.Join(profiles, ", ")))))
+				mcp.Required(),
+				mcp.Enum(profiles...),
+				mcp.Description("The browser's profile to list the search engine queries for"),
+			))
 		}
 		options = append(
 			options,
@@ -77,7 +80,10 @@ func (s *Server) getListSearchEngineQueries() ([]server.ServerTool, error) {
 			options = append(options, mcp.WithDescription(fmt.Sprintf("list queries in search engines in browser %s", browser.Name())))
 			if len(profiles) > 1 {
 				options = append(options, mcp.WithString("profile",
-					mcp.Description(fmt.Sprintf("The %s's profile to list the search engine queries for, possible values are %s", browser.Name(), strings.Join(profiles, ", ")))))
+					mcp.Required(),
+					mcp.Enum(profiles...),
+					mcp.Description(fmt.Sprintf("The %s's profile to list the search engine queries for", browser.Name())),
+				))
 			}
 			options = append(
 				options,
@@ -111,7 +117,10 @@ func (s *Server) getListVisitedPagesFromSearchEngineQuery() ([]server.ServerTool
 		options = append(options, mcp.WithDescription("list the pages visited after doing a specific query in a search engine"))
 		if len(profiles) > 1 {
 			options = append(options, mcp.WithString("profile",
-				mcp.Description(fmt.Sprintf("The browser's profile to list the visited pages for, possible values are %s", strings.Join(profiles, ", ")))))
+				mcp.Required(),
+				mcp.Enum(profiles...),
+				mcp.Description("The browser's profile to list the visited pages for"),
+			))
 		}
 		options = append(
 			options,
@@ -143,7 +152,10 @@ func (s *Server) getListVisitedPagesFromSearchEngineQuery() ([]server.ServerTool
 			options = append(options, mcp.WithDescription(fmt.Sprintf("list the pages visited after doing a specific query in a search engine in browser %s", browser.Name())))
 			if len(profiles) > 1 {
 				options = append(options, mcp.WithString("profile",
-					mcp.Description(fmt.Sprintf("The %s's profile to list the visited pages for, possible values are %s", browser.Name(), strings.Join(profiles, ", ")))))
+					mcp.Required(),
+					mcp.Enum(profiles...),
+					mcp.Description(fmt.Sprintf("The %s's profile to list the visited pages for", browser.Name())),
+				))
 			}
 			options = append(
 				options,

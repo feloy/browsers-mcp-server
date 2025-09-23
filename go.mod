@@ -7,7 +7,7 @@ require (
 	github.com/andrewarchi/browser v0.0.0-20210602185959-ae587407e71c
 	github.com/charmbracelet/log v0.4.2
 	github.com/google/go-cmp v0.7.0
-	github.com/mark3labs/mcp-go v0.39.1
+	github.com/mark3labs/mcp-go v0.40.0
 	github.com/spf13/afero v1.14.0
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10

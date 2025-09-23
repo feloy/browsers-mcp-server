@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"context"
+	"slices"
 	"testing"
 	"time"
 
@@ -58,6 +59,7 @@ func TestListBookmarks(t *testing.T) {
 		expected_names                         []string
 		expected_descriptions                  []string
 		expected_input_properties              [][]string
+		expected_input_properties_required     [][]bool
 		expected_input_properties_descriptions [][]string
 
 		toolName   string
@@ -71,6 +73,9 @@ func TestListBookmarks(t *testing.T) {
 			expected_names:        []string{"list_bookmarks"},
 			expected_descriptions: []string{"List the available bookmarks in the browser"},
 			expected_input_properties: [][]string{
+				{},
+			},
+			expected_input_properties_required: [][]bool{
 				{},
 			},
 			expected_input_properties_descriptions: [][]string{
@@ -96,8 +101,11 @@ func TestListBookmarks(t *testing.T) {
 			expected_input_properties: [][]string{
 				{"profile"},
 			},
+			expected_input_properties_required: [][]bool{
+				{true},
+			},
 			expected_input_properties_descriptions: [][]string{
-				{"The browser's profile to list the bookmarks for, possible values are profile3a, profile3b"},
+				{"The browser's profile to list the bookmarks for"},
 			},
 			toolName: "list_bookmarks",
 			parameters: map[string]interface{}{
@@ -126,9 +134,13 @@ func TestListBookmarks(t *testing.T) {
 				{},
 				{"profile"},
 			},
+			expected_input_properties_required: [][]bool{
+				{},
+				{true},
+			},
 			expected_input_properties_descriptions: [][]string{
 				{},
-				{"The browser's profile to list the bookmarks for, possible values are profile3a, profile3b"},
+				{"The browser's profile to list the bookmarks for"},
 			},
 			toolName: "list_bookmarks_browser3",
 			parameters: map[string]interface{}{
@@ -175,6 +187,7 @@ func TestListBookmarks(t *testing.T) {
 				if len(tool.Tool.InputSchema.Properties) != len(tt.expected_input_properties[i]) {
 					t.Fatalf("Expected input properties count #%d to be %d, but is %d", i, len(tt.expected_input_properties[i]), len(tool.Tool.InputSchema.Properties))
 				}
+
 				for j, property := range tt.expected_input_properties[i] {
 					var foundProperty any
 					var found bool
@@ -186,6 +199,12 @@ func TestListBookmarks(t *testing.T) {
 					if option, ok = foundProperty.(map[string]any); !ok {
 						t.Fatalf("cast error")
 					}
+
+					required := slices.Contains(tool.Tool.InputSchema.Required, property)
+					if required != tt.expected_input_properties_required[i][j] {
+						t.Fatalf("expected property required %v, got %v", tt.expected_input_properties_required[i][j], required)
+					}
+
 					var description string
 					if description, ok = option["description"].(string); !ok {
 						t.Fatalf("description cast error")
