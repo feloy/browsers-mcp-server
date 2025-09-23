@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"context"
+	"slices"
 	"testing"
 	"time"
 
@@ -57,6 +58,7 @@ func TestListSearchEngineHistory(t *testing.T) {
 		expected_names                         []string
 		expected_descriptions                  []string
 		expected_input_properties              [][]string
+		expected_input_properties_required     [][]bool
 		expected_input_properties_descriptions [][]string
 
 		toolName   string
@@ -78,6 +80,10 @@ func TestListSearchEngineHistory(t *testing.T) {
 			expected_input_properties: [][]string{
 				{"day", "limit"},
 				{"query", "day"},
+			},
+			expected_input_properties_required: [][]bool{
+				{false, false},
+				{true, false},
 			},
 			expected_input_properties_descriptions: [][]string{
 				{
@@ -114,14 +120,18 @@ func TestListSearchEngineHistory(t *testing.T) {
 				{"profile", "day", "limit"},
 				{"profile", "query", "day"},
 			},
+			expected_input_properties_required: [][]bool{
+				{true, false, false},
+				{true, true, false},
+			},
 			expected_input_properties_descriptions: [][]string{
 				{
-					"The browser's profile to list the search engine queries for, possible values are profile3a, profile3b",
+					"The browser's profile to list the search engine queries for",
 					"List the search engine queries done on this day (YYYY-MM-DD), default is today",
 					"The maximum number of search engine queries to list, default is 10",
 				},
 				{
-					"The browser's profile to list the visited pages for, possible values are profile3a, profile3b",
+					"The browser's profile to list the visited pages for",
 					"The query string to list the visited pages for",
 					"List the visited pages for queries done on this day (YYYY-MM-DD), default is today",
 				},
@@ -158,13 +168,19 @@ func TestListSearchEngineHistory(t *testing.T) {
 				{"query", "day"},
 				{"profile", "query", "day"},
 			},
+			expected_input_properties_required: [][]bool{
+				{false, false},
+				{true, false, false},
+				{true, false},
+				{true, true, false},
+			},
 			expected_input_properties_descriptions: [][]string{
 				{
 					"List the search engine queries done on this day (YYYY-MM-DD), default is today",
 					"The maximum number of search engine queries to list, default is 10",
 				},
 				{
-					"The browser3's profile to list the search engine queries for, possible values are profile3a, profile3b",
+					"The browser3's profile to list the search engine queries for",
 					"List the search engine queries done on this day (YYYY-MM-DD), default is today",
 					"The maximum number of search engine queries to list, default is 10",
 				},
@@ -173,7 +189,7 @@ func TestListSearchEngineHistory(t *testing.T) {
 					"List the visited pages for queries done on this day (YYYY-MM-DD), default is today",
 				},
 				{
-					"The browser3's profile to list the visited pages for, possible values are profile3a, profile3b",
+					"The browser3's profile to list the visited pages for",
 					"The query string to list the visited pages for",
 					"List the visited pages for queries done on this day (YYYY-MM-DD), default is today",
 				},
@@ -229,6 +245,12 @@ func TestListSearchEngineHistory(t *testing.T) {
 					if option, ok = foundProperty.(map[string]any); !ok {
 						t.Fatalf("cast error")
 					}
+
+					required := slices.Contains(tool.Tool.InputSchema.Required, property)
+					if required != tt.expected_input_properties_required[i][j] {
+						t.Fatalf("expected property required %v, got %v", tt.expected_input_properties_required[i][j], required)
+					}
+
 					var description string
 					if description, ok = option["description"].(string); !ok {
 						t.Fatalf("description cast error")

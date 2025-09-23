@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/feloy/browsers-mcp-server/pkg/browsers"
 	"github.com/mark3labs/mcp-go/mcp"
@@ -26,9 +25,10 @@ func (s *Server) initBookmarksList() []server.ServerTool {
 			options = append(options,
 				mcp.WithString(
 					"profile",
-					mcp.Description(fmt.Sprintf("The browser's profile to list the bookmarks for, possible values are %s", strings.Join(profiles, ", "))),
-				),
-			)
+					mcp.Required(),
+					mcp.Enum(profiles...),
+					mcp.Description("The browser's profile to list the bookmarks for"),
+				))
 		}
 		return []server.ServerTool{
 			{
@@ -50,7 +50,9 @@ func (s *Server) initBookmarksList() []server.ServerTool {
 				options = append(options,
 					mcp.WithString(
 						"profile",
-						mcp.Description(fmt.Sprintf("The browser's profile to list the bookmarks for, possible values are %s", strings.Join(profiles, ", "))),
+						mcp.Required(),
+						mcp.Enum(profiles...),
+						mcp.Description("The browser's profile to list the bookmarks for"),
 					),
 				)
 			}
