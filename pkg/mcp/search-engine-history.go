@@ -264,6 +264,9 @@ func (s *Server) listVisitedPagesFromSearchEngineQueryByBrowser(browserName *str
 			}
 			startTime = t
 			endTime = t.AddDate(0, 0, 1)
+		} else {
+			startTime = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location())
+			endTime = startTime.AddDate(0, 0, 1)
 		}
 
 		query, ok := ctr.GetArguments()["query"].(string)
