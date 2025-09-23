@@ -13,6 +13,7 @@ import (
 
 func TestListBookmarks(t *testing.T) {
 	system.FileSystem = afero.NewMemMapFs()
+	system.Os = "darwin"
 	basePath := filepath.Join(os.Getenv("HOME"), "Library", "Application Support", "Google", "Chrome", "Profile1")
 	system.WriteFile(filepath.Join(basePath, "Bookmarks"), []byte(`{
   "roots": {

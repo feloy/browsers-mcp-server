@@ -11,6 +11,7 @@ import (
 
 func TestReadProfilesIni(t *testing.T) {
 	system.FileSystem = afero.NewMemMapFs()
+	system.Os = "darwin"
 	basePath := filepath.Join(os.Getenv("HOME"), "Library", "Application Support", "Firefox")
 	system.WriteFile(filepath.Join(basePath, "profiles.ini"), []byte(`[Profile0]
 Name=my-profile
