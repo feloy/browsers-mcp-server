@@ -2,7 +2,6 @@ package files
 
 import (
 	"database/sql"
-	"path/filepath"
 	"time"
 
 	"github.com/feloy/browsers-mcp-server/pkg/api"
@@ -62,14 +61,6 @@ func listBookmarksRec(db *sql.DB, parent int, folder []string, result *[]api.Boo
 		listBookmarksRec(db, subdir.id, newFolder, result)
 	}
 	return nil
-}
-
-func getDb(profile string, isRelative bool) (*sql.DB, error) {
-	if isRelative {
-		profile = filepath.Join(getUserDataDirecory(), profile)
-	}
-	path := filepath.Join(profile, "places.sqlite")
-	return sql.Open("sqlite", path)
 }
 
 type subdir struct {
