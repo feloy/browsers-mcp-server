@@ -6,38 +6,38 @@ Supported browsers: Chrome, Firefox, Safari (default profile only).
 
 ## Tools
 
-### list_bookmarks, list_bookmarks_browserName
+### list_bookmarks
 
-List bookmarks for a given profile of a given browser. `list_bookmarks` is provided if only one browser is found. A set of `list_bookmarks_browserName` are provided when several browsers are detected, one for each browser.
-
-Parameters:
-- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
-
-### list_search_engine_queries, list_search_engine_queries_browserName
-
-List the queries in search engines (supported search engines: Google). `list_search_engine_queries` is provided if only one browser is found. A set of `list_search_engine_queries_browserName` are provided when several browsers are detected, one for each browser.
+List bookmarks for a given profile of a given browser.
 
 Parameters:
-- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
+- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if several browsers or several profiles.
+
+### list_search_engine_queries
+
+List the queries in search engines (supported search engines: Google).
+
+Parameters:
+- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if several browsers or several profiles.
 - `day` (`string`, format `YYYY-MM-DD`, optional): list the search engine queries during this day, default is today.
 - `limit` (`number`, optional): the number of results to return, default is 10.
 
-### list_visited_pages_from_search_engine_query, list_visited_pages_from_search_engine_query_browserName
+### list_visited_pages_from_search_engine_query
 
-List the pages visited from a search engine query. `list_visited_pages_from_search_engine_query` is provided if only one browser is found. A set of `list_visited_pages_from_search_engine_query_browserName` are provided when several browsers are detected, one for each browser.
+List the pages visited from a search engine query.
 
 Not supported for Safari browser.
 
-- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
+- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if several browsers or several profiles.
 - `query` (`string`, required): the query string to list the visited pages for.
 - `day` (`string`, format `YYYY-MM-DD`, optional): list the search engine queries during this day, default is today.
 
-### list_source_repos_visits, list_source_repos_visits_browserName
+### list_source_repos_visits
 
-List the pages visited in sources repositories. `list_source_repos_visits` is provided if only one browser is found. A set of `list_source_repos_visits_browserName` are provided when several browsers are detected, one for each browser.
+List the pages visited in sources repositories.
 
 Parameters:
-- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
+- `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if several browsers or several profiles.
 - `day` (`string`, format `YYYY-MM-DD`, optional): list the visits during this day, default is today.
 - `type` (`string`): Type of pages to list (`provider home`, `organization home`, `repository home`, `issues list`, `pull requests list`, `discussions list`, `issue`, `pull request`, `discussion`)
 

@@ -149,54 +149,38 @@ func TestListSearchEngineHistory(t *testing.T) {
 		{
 			name:                 "two available browsers with one or several profiles",
 			browsers:             []*test.Browser{browser1, browser2, browser3},
-			expected_tools_count: 4,
+			expected_tools_count: 2,
 			expected_names: []string{
-				"list_search_engine_queries_browser1",
-				"list_search_engine_queries_browser3",
-				"list_visited_pages_from_search_engine_query_browser1",
-				"list_visited_pages_from_search_engine_query_browser3",
+				"list_search_engine_queries",
+				"list_visited_pages_from_search_engine_query",
 			},
 			expected_descriptions: []string{
-				"list queries in search engines in browser browser1",
-				"list queries in search engines in browser browser3",
-				"list the pages visited after doing a specific query in a search engine in browser browser1",
-				"list the pages visited after doing a specific query in a search engine in browser browser3",
+				"list queries in search engines",
+				"list the pages visited after doing a specific query in a search engine",
 			},
 			expected_input_properties: [][]string{
-				{"day", "limit"},
 				{"profile", "day", "limit"},
-				{"query", "day"},
 				{"profile", "query", "day"},
 			},
 			expected_input_properties_required: [][]bool{
-				{false, false},
 				{true, false, false},
-				{true, false},
 				{true, true, false},
 			},
 			expected_input_properties_descriptions: [][]string{
 				{
+					"The browser's profile to list the search engine queries for",
 					"List the search engine queries done on this day (YYYY-MM-DD), default is today",
 					"The maximum number of search engine queries to list, default is 10",
 				},
 				{
-					"The browser3's profile to list the search engine queries for",
-					"List the search engine queries done on this day (YYYY-MM-DD), default is today",
-					"The maximum number of search engine queries to list, default is 10",
-				},
-				{
-					"The query string to list the visited pages for",
-					"List the visited pages for queries done on this day (YYYY-MM-DD), default is today",
-				},
-				{
-					"The browser3's profile to list the visited pages for",
+					"The browser's profile to list the visited pages for",
 					"The query string to list the visited pages for",
 					"List the visited pages for queries done on this day (YYYY-MM-DD), default is today",
 				},
 			},
-			toolName: "list_search_engine_queries_browser3",
+			toolName: "list_search_engine_queries",
 			parameters: map[string]interface{}{
-				"profile": "profile3a",
+				"profile": "profile3a on browser3",
 			},
 			expected: `The following search queries (YAML format) were found:
 - query: what is it
