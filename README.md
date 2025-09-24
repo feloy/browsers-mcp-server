@@ -2,7 +2,7 @@
 
 An MCP server provideing read-only access to browsers configuration files: profiles, bookmarks, history.
 
-Supported browsers: Chrome, Firefox.
+Supported browsers: Chrome, Firefox, Safari (default profile only).
 
 ## Tools
 
@@ -25,6 +25,8 @@ Parameters:
 ### list_visited_pages_from_search_engine_query, list_visited_pages_from_search_engine_query_browserName
 
 List the pages visited from a search engine query. `list_visited_pages_from_search_engine_query` is provided if only one browser is found. A set of `list_visited_pages_from_search_engine_query_browserName` are provided when several browsers are detected, one for each browser.
+
+Not supported for Safari browser.
 
 - `profile` (`string`): the profile name (as indicated in the description of the parameter). Provided only if the browser has several profiles.
 - `query` (`string`, required): the query string to list the visited pages for.
