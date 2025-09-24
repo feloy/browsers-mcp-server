@@ -13,6 +13,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
+	howett.net/plist v1.0.1
 	k8s.io/klog/v2 v2.130.1
 	modernc.org/sqlite v1.38.2
 )
