@@ -124,27 +124,23 @@ func TestListBookmarks(t *testing.T) {
 		{
 			name:                 "two available browsers with one or two profiles",
 			browsers:             []*test.Browser{browser1, browser2, browser3},
-			expected_tools_count: 2,
-			expected_names:       []string{"list_bookmarks_browser1", "list_bookmarks_browser3"},
+			expected_tools_count: 1,
+			expected_names:       []string{"list_bookmarks"},
 			expected_descriptions: []string{
-				"List the available bookmarks in browser browser1",
-				"List the available bookmarks in browser browser3",
+				"List the available bookmarks in the browser",
 			},
 			expected_input_properties: [][]string{
-				{},
 				{"profile"},
 			},
 			expected_input_properties_required: [][]bool{
-				{},
 				{true},
 			},
 			expected_input_properties_descriptions: [][]string{
-				{},
 				{"The browser's profile to list the bookmarks for"},
 			},
-			toolName: "list_bookmarks_browser3",
+			toolName: "list_bookmarks",
 			parameters: map[string]interface{}{
-				"profile": "profile3a",
+				"profile": "profile3a on browser3",
 			},
 			expected: `The following bookmarks (YAML format) were found:
 - name: bookmark3a
